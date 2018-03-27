@@ -507,8 +507,6 @@ struct KVMeta {
     int key = DecodeKey(req_data.keys[0]);
     auto& stored = store_[key];
 
-    std::cout << "DataHandleDefault" << "\n";
-
     // there used several WaitToRead, this is because \a recved's memory
     // could be deallocated when this function returns. so we need to make sure
     // the operators with \a NDArray are actually finished
@@ -540,11 +538,14 @@ struct KVMeta {
         auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
           merged.array = NDArray(dshape, Context()); // Context()?
+          std::cout << "merge.array is none" << merged.array << "\n";
         }
         if (merged.request.size() == 0) {
           CopyFromTo(recved, &merged.array, 0);
+          std::cout << "size == 0" << merged.array << "\n";
         } else {
           merged.array += recved;
+          std::cout << "size != 0" << merged.array << "\n";
         }
         merged.request.push_back(req_meta);
         ApplyUpdates(key, &merged, &stored, server);
