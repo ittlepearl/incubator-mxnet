@@ -85,7 +85,7 @@ USE_NCCL_PATH = NONE
 # whether use opencv during compilation
 # you can disable it, however, you will not able to use
 # imbin iterator
-USE_OPENCV = 1
+USE_OPENCV = 0
 
 #whether use libjpeg-turbo for image decode without OpenCV wrapper
 USE_LIBJPEG_TURBO = 0
@@ -110,6 +110,7 @@ USE_BLAS = apple
 else
 USE_BLAS = atlas
 endif
+USE_BLAS = openblas
 
 # whether use lapack during compilation
 # only effective when compiled with blas versions openblas/apple/atlas/mkl
@@ -144,7 +145,7 @@ endif
 #----------------------------
 
 # whether or not to enable multi-machine supporting
-USE_DIST_KVSTORE = 0
+USE_DIST_KVSTORE = 1
 
 # whether or not allow to read and write HDFS directly. If yes, then hadoop is
 # required
