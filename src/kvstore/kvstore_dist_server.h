@@ -37,7 +37,7 @@
 #include "../operator/tensor/elemwise_binary_op-inl.h"
 #include "../operator/tensor/init_op.h"
 
-#include <iostream>
+// #include <iostream>
 
 namespace mxnet {
 namespace kvstore {
@@ -124,7 +124,7 @@ class KVStoreDistServer {
     sync_mode_ = false;
     gradient_compression_ = std::make_shared<GradientCompression>();
     log_verbose_ = dmlc::GetEnv("MXNET_KVSTORE_DIST_ROW_SPARSE_VERBOSE", false);
-    cout << "KVStoreDIstServer constructor" << "\n";
+    // cout << "KVStoreDIstServer constructor" << "\n";
   }
 
   ~KVStoreDistServer() {
@@ -508,7 +508,7 @@ struct KVMeta {
     int key = DecodeKey(req_data.keys[0]);
     auto& stored = store_[key];
 
-    cout << "DataHandleDefault" << "\n";
+    // cout << "DataHandleDefault" << "\n";
 
     // there used several WaitToRead, this is because \a recved's memory
     // could be deallocated when this function returns. so we need to make sure
