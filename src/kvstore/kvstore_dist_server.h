@@ -123,7 +123,6 @@ class KVStoreDistServer {
     sync_mode_ = false;
     gradient_compression_ = std::make_shared<GradientCompression>();
     log_verbose_ = dmlc::GetEnv("MXNET_KVSTORE_DIST_ROW_SPARSE_VERBOSE", false);
-    std::out << "KVStoreDIstServer constructor" << "\n";
   }
 
   ~KVStoreDistServer() {
@@ -507,8 +506,6 @@ struct KVMeta {
     int key = DecodeKey(req_data.keys[0]);
     auto& stored = store_[key];
 
-    std::cout << "DataHandleDefault" << "\n";
-
     // there used several WaitToRead, this is because \a recved's memory
     // could be deallocated when this function returns. so we need to make sure
     // the operators with \a NDArray are actually finished
@@ -536,6 +533,7 @@ struct KVMeta {
         server->Response(req_meta); // ?
         stored.WaitToRead();
       } else if (sync_mode_) {
+        /* ------ original code ------- /
         // synced push -- use merfed_buf_:It represents values from different workers being merged.
         auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
@@ -548,6 +546,25 @@ struct KVMeta {
         }
         merged.request.push_back(req_meta);
         ApplyUpdates(key, &merged, &stored, server);
+        --------- original code ends ----------*/
+        auto& push_vector = all_push_buf_[key];
+        push_vector.push_back(recved);
+
+        // testing
+        auto& merged = merge_buf_[key];
+        if (merged.array.is_none()) {
+          merged.array = NDArray(dshape, Context()); // Context()?
+        }
+        merged.request.push_back(req_meta);
+        if (push_vector.size() == (size_t) ps::NumWorkers()) {
+          CopyFromTo(push_vector[0], &merged.array, 0);
+          for (int i = 1; i < push_vector.size(); i++) {
+            merged.array += push_vector[i];
+          }
+          LG<<"copy from vector to merged";
+        }
+        ApplyUpdates(key, &merged, &stored, server);
+
       } else {
         // async push
         exec_.Exec([this, key, &recved, &stored](){
@@ -589,6 +606,14 @@ struct KVMeta {
    * to this value when values from all workers are pushed into this buffer.
    */
   std::unordered_map<int, MergeBuf> merge_buf_;
+
+  /**
+   * \brief all_push_buf_ is a buffer used if sync_mode is true. It represents
+   * all pushed data from all workers in a single iteration. The store will be
+   * updated to an aggregated value when values from all workers are pushed
+   * into this buffer.
+   */
+  std::unordered_map<int, std::vector<NDArray>> all_push_buf_;
 
   /**
    * \brief decomp_buf_ is a buffer into which compressed values are
