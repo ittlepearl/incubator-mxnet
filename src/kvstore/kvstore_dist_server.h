@@ -123,7 +123,7 @@ class KVStoreDistServer {
     sync_mode_ = false;
     gradient_compression_ = std::make_shared<GradientCompression>();
     log_verbose_ = dmlc::GetEnv("MXNET_KVSTORE_DIST_ROW_SPARSE_VERBOSE", false);
-    std::out << "KVStoreDIstServer constructor" << "\n";
+    std::cout << "KVStoreDIstServer constructor" << "\n";
   }
 
   ~KVStoreDistServer() {
