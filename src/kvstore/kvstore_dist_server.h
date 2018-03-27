@@ -37,6 +37,8 @@
 #include "../operator/tensor/elemwise_binary_op-inl.h"
 #include "../operator/tensor/init_op.h"
 
+#include <iostream>
+
 namespace mxnet {
 namespace kvstore {
 
@@ -122,6 +124,7 @@ class KVStoreDistServer {
     sync_mode_ = false;
     gradient_compression_ = std::make_shared<GradientCompression>();
     log_verbose_ = dmlc::GetEnv("MXNET_KVSTORE_DIST_ROW_SPARSE_VERBOSE", false);
+    cout << "KVStoreDIstServer constructor" << "\n";
   }
 
   ~KVStoreDistServer() {
@@ -266,6 +269,12 @@ class KVStoreDistServer {
       if (sync_mode_) {
         if (log_verbose_) LOG(INFO) << "sync push: " << master_key << " " << req_data.keys;
         auto& merged = merge_buf_[master_key];
+        /* merged type:
+        struct MergeBuf {
+          std::vector<ps::KVMeta> request;
+          NDArray array;
+        };
+        */
         if (merged.array.is_none()) {
           merged.array = NDArray(kRowSparseStorage, stored.shape(), Context());
         }
@@ -456,6 +465,35 @@ class KVStoreDistServer {
     }
   }
 
+/**
+struct KVPairs {
+  // /** \brief empty constructor
+  // KVPairs() {}
+  /** \brief the list of keys
+  SArray<Key> keys;
+  /** \brief the according values
+  SArray<Val> vals;
+  /** \brief the according value lengths (could be empty)
+  SArray<int> lens;
+};
+*/
+
+/*
+/** \brief meta information about a kv request
+struct KVMeta {
+  /** \brief the int cmd
+  int cmd;
+  /** \brief whether or not this is a push request
+  bool push;
+  /** \brief sender's node id
+  int sender;
+  /** \brief the associated timestamp
+  int timestamp;
+  /** \brief the customer id of worker
+  int customer_id;
+};
+*/
+
   void DataHandleDefault(const ps::KVMeta& req_meta,
                          const ps::KVPairs<real_t> &req_data,
                          ps::KVServer<real_t>* server) {
@@ -470,26 +508,39 @@ class KVStoreDistServer {
     int key = DecodeKey(req_data.keys[0]);
     auto& stored = store_[key];
 
+    cout << "DataHandleDefault" << "\n";
+
     // there used several WaitToRead, this is because \a recved's memory
     // could be deallocated when this function returns. so we need to make sure
     // the operators with \a NDArray are actually finished
     if (req_meta.push) {
+      // push
       size_t ds[] = {(size_t)req_data.lens[0]};
       TShape dshape(ds, ds + 1);
+
+      // TBlob: tensor blob class that can be used to hold tensor of any dimension, any device and any data type, This is a weak type that can be used to transfer data through interface TBlob itself do not involve any arithmentic operations, but it can be converted to tensor of fixed dimension for further operations More...
+      // namespace mxnet
       TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
                       dshape, cpu::kDevMask);
-      NDArray recved = NDArray(recv_blob, 0);
+      NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
       if (stored.is_none()) {
         // initialization
         stored = NDArray(dshape, Context());
         CopyFromTo(recved, &stored, 0);
-        server->Response(req_meta);
+        /*void mxnet::CopyFromTo	(	const NDArray & 	from,
+          const NDArray * 	to,
+          int 	priority = 0
+          )
+          issue an copy operation from one NDArray to another the two ndarray can sit on different devices this operation will be scheduled by the engine
+        */
+
+        server->Response(req_meta); // ?
         stored.WaitToRead();
       } else if (sync_mode_) {
-        // synced push
+        // synced push -- use merfed_buf_:It represents values from different workers being merged.
         auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
-          merged.array = NDArray(dshape, Context());
+          merged.array = NDArray(dshape, Context()); // Context()?
         }
         if (merged.request.size() == 0) {
           CopyFromTo(recved, &merged.array, 0);
@@ -507,7 +558,9 @@ class KVStoreDistServer {
         server->Response(req_meta);
         stored.WaitToRead();
       }
-    } else {
+    }
+    else {
+      // pull
       DefaultStorageResponse(key, stored, req_meta, req_data, server);
     }
   }
@@ -518,6 +571,7 @@ class KVStoreDistServer {
   }
 
 
+  // belows are also private variables
   /**
    * \brief user defined mode for push
    */
