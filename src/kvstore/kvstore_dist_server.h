@@ -561,6 +561,7 @@ struct KVMeta {
           for (int i = 1; i < push_vector.size(); i++) {
             merged.array += push_vector[i];
           }
+          LG<<"copy from vector to merged";
         }
         ApplyUpdates(key, &merged, &stored, server);
 
