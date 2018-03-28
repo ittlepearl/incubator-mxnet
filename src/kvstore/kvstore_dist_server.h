@@ -551,6 +551,7 @@ struct KVMeta {
         push_vector.push_back(recved);
 
         // testing
+        auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
           merged.array = NDArray(dshape, Context()); // Context()?
         }
