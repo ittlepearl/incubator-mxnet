@@ -211,6 +211,26 @@ class KVStoreDistServer {
     }
   }
 
+  void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
+                           ps::KVServer<real_t>* server) {
+    double score[push_vector.size()];
+    for (int i = 0; i < push_vector.size(); i++) {
+      NDArray v = push_vector[i];
+      for (int j = 0; j < push_vector.size(); j++) {
+        if (i == j) continue;
+
+        NDArray dist = push_vector[j];
+        dist -= v;
+        dist *= dist;
+
+        // TODO: get score: sum up all dimension of dist
+        // score[i] = sum(dist);
+      }
+    }
+
+
+  }
+
   void DecodeRowIds(const ps::SArray<ps::Key> &keys, int64_t *indices,
                     const int64_t master_key, const int64_t num_rows) {
     indices[0] = 0;
@@ -556,12 +576,15 @@ struct KVMeta {
           merged.array = NDArray(dshape, Context()); // Context()?
         }
         merged.request.push_back(req_meta);
+        // LG<<"size of push_vector:" << push_vector.size() << "size of merged" << merged.request.size();
         if (push_vector.size() == (size_t) ps::NumWorkers()) {
+          // KrumApplyUpdates(key, push_vector, &stored,server);
           CopyFromTo(push_vector[0], &merged.array, 0);
           for (int i = 1; i < push_vector.size(); i++) {
             merged.array += push_vector[i];
           }
           LG<<"copy from vector to merged";
+          push_vector.clear();
         }
         ApplyUpdates(key, &merged, &stored, server);
 
