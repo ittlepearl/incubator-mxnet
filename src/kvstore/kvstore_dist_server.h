@@ -605,16 +605,22 @@ struct KVMeta {
         if (merged.array.is_none()) {
           merged.array = NDArray(dshape, Context()); // Context()?
         }
+
+        if (merged.request.size() == 0) {
+          CopyFromTo(recved, &merged.array, 0);
+        } else {
+          merged.array += recved;
+        }
+
         merged.request.push_back(req_meta);
-        // LG<<"size of push_vector:" << push_vector.size() << "size of merged" << merged.request.size();
         if (push_vector.size() == (size_t) ps::NumWorkers()) {
           // KrumApplyUpdates(key, push_vector, &stored,server);
-          CopyFromTo(push_vector[0], &merged.array, 0);
+          NDArray merged2 = push_vector[0];
           for (int i = 1; i < push_vector.size(); i++) {
-            merged.array += push_vector[i];
+            merged2 += push_vector[i];
           }
-          // LG<<"copy from vector to merged";
           push_vector.clear();
+          LG<<"merged" << merged.array.data() << "push sum" << merged2.data();
         }
         ApplyUpdates(key, &merged, &stored, server);
       } else {
