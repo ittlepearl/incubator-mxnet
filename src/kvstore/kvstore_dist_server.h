@@ -617,7 +617,6 @@ struct KVMeta {
           push_vector.clear();
         }
         ApplyUpdates(key, &merged, &stored, server);
-
       } else {
         // async push
         exec_.Exec([this, key, &recved, &stored](){
