@@ -210,7 +210,7 @@ class KVStoreDistServer {
       merged->array.WaitToRead();
     }
   }
-
+/*
   typedef pair<int, double> PAIR;
   struct CmpByVScore {
     bool operator()(const PAIR& lhs, const PAIR& rhs) {
@@ -218,7 +218,7 @@ class KVStoreDistServer {
     }
   };
 
-/*
+
   void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
                            ps::KVServer<real_t>* server，MergeBuf *merged, int key, int bzt_num) {
     vector<PAIR> idx_score_vec(push_vector.size());
