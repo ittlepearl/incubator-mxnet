@@ -211,25 +211,55 @@ class KVStoreDistServer {
     }
   }
 
+  typedef pair<int, double> PAIR;
+  struct CmpByVScore {
+    bool operator()(const PAIR& lhs, const PAIR& rhs) {
+      return lhs.second < rhs.second;
+    }
+  };
+
+/*
   void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
-                           ps::KVServer<real_t>* server) {
-    double score[push_vector.size()];
+                           ps::KVServer<real_t>* server，MergeBuf *merged, int key, int bzt_num) {
+    vector<PAIR> idx_score_vec(push_vector.size());
     for (int i = 0; i < push_vector.size(); i++) {
       NDArray v = push_vector[i];
+      double score = 0;
       for (int j = 0; j < push_vector.size(); j++) {
         if (i == j) continue;
 
+        // calculate distance NDArray
         NDArray dist = push_vector[j];
         dist -= v;
         dist *= dist;
 
-        // TODO: get score: sum up all dimension of dist
-        // score[i] = sum(dist);
+        // get distance's data and reshape to 1-d
+        TBlob *data = dist.data()
+        data->FlatTo1D();
+
+        // sum up distance and add to score
+        for (int i = 0; i < data.Size(); i++) {
+          score += data[i];
+        }
       }
+      // store <index, score> pair into vector<int>
+      idx_score_vec.push_back(make_pair(i, score));
     }
 
+    // sort vector
+    sort(name_score_vec.begin(), name_score_vec.end(), CmpByScore());
 
+    // get m-q-2 small vector
+    for (int i = 1; i < ps::NumWorkers() - bzt_num - 2; i++) {
+      merged->array += push_vector[name_score_vec[i].first];
+    }
+    // scale the array
+    merged->array *= ps::NumWorkers();
+    merged->array /= ps::NumWorkers() - bzt_num - 2;
+
+    ApplyUpdates(key, &merged, stored, server);
   }
+  */
 
   void DecodeRowIds(const ps::SArray<ps::Key> &keys, int64_t *indices,
                     const int64_t master_key, const int64_t num_rows) {
@@ -583,7 +613,7 @@ struct KVMeta {
           for (int i = 1; i < push_vector.size(); i++) {
             merged.array += push_vector[i];
           }
-          LG<<"copy from vector to merged";
+          // LG<<"copy from vector to merged";
           push_vector.clear();
         }
         ApplyUpdates(key, &merged, &stored, server);
