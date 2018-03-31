@@ -625,7 +625,7 @@ struct KVMeta {
             merged2.array += push_vector[i];
           }
           push_vector.clear();
-          LG<<"merged:" << merged.array.data() << " push sum:" << merged2.array.data();
+          LG<<"merged:" << merged.array[0] << " push sum:" << merged2.array[0];
         }
         ApplyUpdates(key, &merged, &stored, server);
       } else {
