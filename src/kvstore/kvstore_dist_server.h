@@ -37,6 +37,9 @@
 #include "../operator/tensor/elemwise_binary_op-inl.h"
 #include "../operator/tensor/init_op.h"
 
+#include <utility>    //pair
+#include <algorithm>  // sort
+
 
 namespace mxnet {
 namespace kvstore {
@@ -234,7 +237,7 @@ class KVStoreDistServer {
         dist *= dist;
 
         // get distance's data and reshape to 1-d
-        TBlob *data = dist.data()
+        TBlob *data = dist.data();
         data->FlatTo1D();
 
         // sum up distance and add to score
