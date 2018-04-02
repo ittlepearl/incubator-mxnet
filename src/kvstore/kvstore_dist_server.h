@@ -219,7 +219,7 @@ class KVStoreDistServer {
   };
 
   void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
-                           ps::KVServer<real_t>* server，MergeBuf *merged/*, int bzt_num*/) {
+                           ps::KVServer<real_t>* server, MergeBuf *merged/*, int bzt_num*/) {
     // calculate score and create pair
     vector<PAIR> idx_score_vec(push_vector.size());
     for (int i = 0; i < push_vector.size(); i++) {
@@ -611,7 +611,7 @@ struct KVMeta {
         }
         // testing
         else if (push_vector.size() == (size_t) ps::NumWorkers()){
-          KrumApplyUpdates(key, push_vector, &stored,server，&merged);
+          KrumApplyUpdates(key, push_vector, &stored,server, &merged);
           push_vector.clear();
         }
 
