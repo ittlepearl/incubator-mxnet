@@ -210,7 +210,7 @@ class KVStoreDistServer {
       merged->array.WaitToRead();
     }
   }
-/*
+
   typedef pair<int, double> PAIR;
   struct CmpByVScore {
     bool operator()(const PAIR& lhs, const PAIR& rhs) {
@@ -218,9 +218,9 @@ class KVStoreDistServer {
     }
   };
 
-
   void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
-                           ps::KVServer<real_t>* server，MergeBuf *merged, int key, int bzt_num) {
+                           ps::KVServer<real_t>* server，MergeBuf *merged/*, int bzt_num*/) {
+    // calculate score and create pair
     vector<PAIR> idx_score_vec(push_vector.size());
     for (int i = 0; i < push_vector.size(); i++) {
       NDArray v = push_vector[i];
@@ -250,16 +250,17 @@ class KVStoreDistServer {
     sort(name_score_vec.begin(), name_score_vec.end(), CmpByScore());
 
     // get m-q-2 small vector
-    for (int i = 1; i < ps::NumWorkers() - bzt_num - 2; i++) {
+    CopyFromTo(push_vector[0], &merged.array, 0);
+    for (int i = 1; i < ps::NumWorkers(); i++) {
       merged->array += push_vector[name_score_vec[i].first];
     }
-    // scale the array
-    merged->array *= ps::NumWorkers();
-    merged->array /= ps::NumWorkers() - bzt_num - 2;
+    // // scale the array
+    // merged->array *= ps::NumWorkers();
+    // merged->array /= ps::NumWorkers() - bzt_num - 2;
 
     ApplyUpdates(key, &merged, stored, server);
   }
-  */
+
 
   void DecodeRowIds(const ps::SArray<ps::Key> &keys, int64_t *indices,
                     const int64_t master_key, const int64_t num_rows) {
@@ -610,44 +611,10 @@ struct KVMeta {
         }
         // testing
         else if (push_vector.size() == (size_t) ps::NumWorkers()){
-          CopyFromTo(push_vector[0], &merged.array, 0);
-          for (int i = 1; i < push_vector.size(); i++) {
-            merged.array += push_vector[i];
-          }
+          KrumApplyUpdates(key, push_vector, &stored,server，&merged)
           push_vector.clear();
-          ApplyUpdates(key, &merged, &stored, server);
         }
 
-
-        // // testing
-        // auto& merged = merge_buf_[key];
-        // auto& merged2 = merge_buf_[key];
-        // if (merged.array.is_none()) {
-        //   merged.array = NDArray(dshape, Context()); // Context()?
-        // }
-        // if (merged2.array.is_none()) {
-        //   merged2.array = NDArray(dshape, Context()); // Context()?
-        // }
-        //
-        // if (merged.request.size() == 0) {
-        //   CopyFromTo(recved, &merged.array, 0);
-        // } else {
-        //   merged.array += recved;
-        // }
-        //
-        // merged.request.push_back(req_meta);
-        // merged2.request.push_back(req_meta);
-        // if (push_vector.size() == (size_t) ps::NumWorkers()) {
-        //   // KrumApplyUpdates(key, push_vector, &stored,server);
-        //   CopyFromTo(push_vector[0], &merged2.array, 0);
-        //   for (int i = 1; i < push_vector.size(); i++) {
-        //     merged2.array += push_vector[i];
-        //   }
-        //   push_vector.clear();
-        //   LG<<"merged:" << merged.array[0] << " push sum:" << merged2.array[0];
-        //   merged2->request.clear();
-        // }
-        // ApplyUpdates(key, &merged, &stored, server);
       } else {
         // async push
         exec_.Exec([this, key, &recved, &stored](){
