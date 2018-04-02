@@ -583,11 +583,11 @@ struct KVMeta {
         server->Response(req_meta); // ?
         stored.WaitToRead();
       } else if (sync_mode_) {
-        //  /* ------ original code ------- /
+         /* ------ original code ------- /
         // synced push -- use merfed_buf_:It represents values from different workers being merged.
         auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
-          merged.array = NDArray(dshape, Context()); // Context()?
+          merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
         }
         if (merged.request.size() == 0) {
           CopyFromTo(recved, &merged.array, 0);
@@ -596,10 +596,29 @@ struct KVMeta {
         }
         merged.request.push_back(req_meta);
         ApplyUpdates(key, &merged, &stored, server);
-        // --------- original code ends ----------*/
-        // auto& push_vector = all_push_buf_[key];
-        // push_vector.push_back(recved);
-        //
+        --------- original code ends ----------*/
+        // testing
+        auto& merged = merge_buf_[key];
+        merged.request.push_back(req_meta);
+
+        auto& push_vector = all_push_buf_[key];
+        one_array = NDArray(dshape, Context());
+        CopyFromTo(recved, &one_array, 0);
+        push_vector.push_back(one_array);
+        if (push_vector.size() < (size_t) ps::NumWorkers()){
+          one_array.WaitToRead();
+        }
+        // testing
+        else if (push_vector.size() == (size_t) ps::NumWorkers()){
+          CopyFromTo(push_vector[0], &merged.array, 0);
+          for (int i = 1; i < push_vector.size(); i++) {
+            merged.array += push_vector[i];
+          }
+          push_vector.clear();
+          ApplyUpdates(key, &merged, &stored, server);
+        }
+
+
         // // testing
         // auto& merged = merge_buf_[key];
         // auto& merged2 = merge_buf_[key];
