@@ -583,7 +583,7 @@ struct KVMeta {
         server->Response(req_meta); // ?
         stored.WaitToRead();
       } else if (sync_mode_) {
-        /* ------ original code ------- /
+        //  /* ------ original code ------- /
         // synced push -- use merfed_buf_:It represents values from different workers being merged.
         auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
@@ -596,38 +596,39 @@ struct KVMeta {
         }
         merged.request.push_back(req_meta);
         ApplyUpdates(key, &merged, &stored, server);
-        --------- original code ends ----------*/
-        auto& push_vector = all_push_buf_[key];
-        push_vector.push_back(recved);
-
-        // testing
-        auto& merged = merge_buf_[key];
-        auto& merged2 = merge_buf_[key];
-        if (merged.array.is_none()) {
-          merged.array = NDArray(dshape, Context()); // Context()?
-        }
-        if (merged2.array.is_none()) {
-          merged2.array = NDArray(dshape, Context()); // Context()?
-        }
-
-        if (merged.request.size() == 0) {
-          CopyFromTo(recved, &merged.array, 0);
-        } else {
-          merged.array += recved;
-        }
-
-        merged.request.push_back(req_meta);
-        merged2.request.push_back(req_meta);
-        if (push_vector.size() == (size_t) ps::NumWorkers()) {
-          // KrumApplyUpdates(key, push_vector, &stored,server);
-          CopyFromTo(push_vector[0], &merged2.array, 0);
-          for (int i = 1; i < push_vector.size(); i++) {
-            merged2.array += push_vector[i];
-          }
-          push_vector.clear();
-          
-        }
-        ApplyUpdates(key, &merged, &stored, server);
+        // --------- original code ends ----------*/
+        // auto& push_vector = all_push_buf_[key];
+        // push_vector.push_back(recved);
+        //
+        // // testing
+        // auto& merged = merge_buf_[key];
+        // auto& merged2 = merge_buf_[key];
+        // if (merged.array.is_none()) {
+        //   merged.array = NDArray(dshape, Context()); // Context()?
+        // }
+        // if (merged2.array.is_none()) {
+        //   merged2.array = NDArray(dshape, Context()); // Context()?
+        // }
+        //
+        // if (merged.request.size() == 0) {
+        //   CopyFromTo(recved, &merged.array, 0);
+        // } else {
+        //   merged.array += recved;
+        // }
+        //
+        // merged.request.push_back(req_meta);
+        // merged2.request.push_back(req_meta);
+        // if (push_vector.size() == (size_t) ps::NumWorkers()) {
+        //   // KrumApplyUpdates(key, push_vector, &stored,server);
+        //   CopyFromTo(push_vector[0], &merged2.array, 0);
+        //   for (int i = 1; i < push_vector.size(); i++) {
+        //     merged2.array += push_vector[i];
+        //   }
+        //   push_vector.clear();
+        //   LG<<"merged:" << merged.array[0] << " push sum:" << merged2.array[0];
+        //   merged2->request.clear();
+        // }
+        // ApplyUpdates(key, &merged, &stored, server);
       } else {
         // async push
         exec_.Exec([this, key, &recved, &stored](){
