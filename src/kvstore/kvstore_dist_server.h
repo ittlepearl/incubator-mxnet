@@ -215,11 +215,11 @@ class KVStoreDistServer {
   }
 
   typedef std::pair<int, double> PAIR;
-  struct CmpByVScore {
-    bool operator() (const PAIR& lhs, const PAIR& rhs) {
-      return lhs.second < rhs.second;
-    }
-  };
+  // struct CmpByVScore {
+  //   bool operator() (const PAIR& lhs, const PAIR& rhs) {
+  //     return lhs.second < rhs.second;
+  //   }
+  // };
 
   void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
                            ps::KVServer<real_t>* server, MergeBuf *merged/*, int bzt_num*/) {
@@ -250,10 +250,12 @@ class KVStoreDistServer {
     }
 
     // sort vector
-    std::sort(idx_score_vec.begin(), idx_score_vec.end(), CmpByScore());
+    std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
+        return x.second < y.second;
+    });
 
     // get m-q-2 small vector
-    CopyFromTo(push_vector[0], &merged.array, 0);
+    CopyFromTo(push_vector[0], &merged->array, 0);
     for (int i = 1; i < ps::NumWorkers(); i++) {
       merged->array += push_vector[idx_score_vec[i].first];
     }
@@ -606,7 +608,7 @@ struct KVMeta {
         merged.request.push_back(req_meta);
 
         auto& push_vector = all_push_buf_[key];
-        one_array = NDArray(dshape, Context());
+        NDArray one_array = NDArray(dshape, Context());
         CopyFromTo(recved, &one_array, 0);
         push_vector.push_back(one_array);
         if (push_vector.size() < (size_t) ps::NumWorkers()){
