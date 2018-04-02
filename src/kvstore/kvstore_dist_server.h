@@ -214,7 +214,7 @@ class KVStoreDistServer {
     }
   }
 
-  typedef pair<int, double> PAIR;
+  typedef std::pair<int, double> PAIR;
   struct CmpByVScore {
     bool operator()(const PAIR& lhs, const PAIR& rhs) {
       return lhs.second < rhs.second;
@@ -237,8 +237,8 @@ class KVStoreDistServer {
         dist *= dist;
 
         // get distance's data and reshape to 1-d
-        TBlob *data = dist.data();
-        data->FlatTo1D();
+        TBlob data = dist.data();
+        data.FlatTo1D();
 
         // sum up distance and add to score
         for (int i = 0; i < data.Size(); i++) {
@@ -246,7 +246,7 @@ class KVStoreDistServer {
         }
       }
       // store <index, score> pair into vector<int>
-      idx_score_vec.push_back(make_pair(i, score));
+      idx_score_vec.push_back(std::make_pair(i, score));
     }
 
     // sort vector
