@@ -216,7 +216,7 @@ class KVStoreDistServer {
 
   typedef std::pair<int, double> PAIR;
   struct CmpByVScore {
-    bool operator()(const PAIR& lhs, const PAIR& rhs) {
+    bool operator() (const PAIR& lhs, const PAIR& rhs) {
       return lhs.second < rhs.second;
     }
   };
@@ -238,7 +238,7 @@ class KVStoreDistServer {
 
         // get distance's data and reshape to 1-d
         TBlob data = dist.data();
-        data.FlatTo1D();
+        // data = data.FlatTo1D();
 
         // sum up distance and add to score
         for (int i = 0; i < data.Size(); i++) {
@@ -250,12 +250,12 @@ class KVStoreDistServer {
     }
 
     // sort vector
-    std::sort(name_score_vec.begin(), name_score_vec.end(), CmpByScore());
+    std::sort(idx_score_vec.begin(), idx_score_vec.end(), CmpByScore());
 
     // get m-q-2 small vector
     CopyFromTo(push_vector[0], &merged.array, 0);
     for (int i = 1; i < ps::NumWorkers(); i++) {
-      merged->array += push_vector[name_score_vec[i].first];
+      merged->array += push_vector[idx_score_vec[i].first];
     }
     // // scale the array
     // merged->array *= ps::NumWorkers();
