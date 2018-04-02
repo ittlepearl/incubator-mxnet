@@ -237,12 +237,12 @@ class KVStoreDistServer {
         dist *= dist;
 
         // get distance's data and reshape to 1-d
-        TBlob data = dist.data();
+        Blob data = dist.data();
         // data = data.FlatTo1D();
 
         // sum up distance and add to score
         for (int i = 0; i < data.Size(); i++) {
-          score += data[i];
+          score += dist.At(index_t(i));
         }
       }
       // store <index, score> pair into vector<int>
