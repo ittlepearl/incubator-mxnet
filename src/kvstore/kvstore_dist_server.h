@@ -258,7 +258,7 @@ class KVStoreDistServer {
     // merged->array *= ps::NumWorkers();
     // merged->array /= ps::NumWorkers() - bzt_num - 2;
 
-    ApplyUpdates(key, &merged, stored, server);
+    ApplyUpdates(key, merged, stored, server);
   }
 
 
@@ -611,7 +611,7 @@ struct KVMeta {
         }
         // testing
         else if (push_vector.size() == (size_t) ps::NumWorkers()){
-          KrumApplyUpdates(key, push_vector, &stored,server，&merged)
+          KrumApplyUpdates(key, push_vector, &stored,server，&merged);
           push_vector.clear();
         }
 
