@@ -224,7 +224,7 @@ class KVStoreDistServer {
   void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
                            ps::KVServer<real_t>* server, MergeBuf *merged/*, int bzt_num*/) {
     // calculate score and create pair
-    vector<PAIR> idx_score_vec(push_vector.size());
+    std::vector<PAIR> idx_score_vec(push_vector.size());
     for (int i = 0; i < push_vector.size(); i++) {
       NDArray v = push_vector[i];
       double score = 0;
@@ -250,7 +250,7 @@ class KVStoreDistServer {
     }
 
     // sort vector
-    sort(name_score_vec.begin(), name_score_vec.end(), CmpByScore());
+    std::sort(name_score_vec.begin(), name_score_vec.end(), CmpByScore());
 
     // get m-q-2 small vector
     CopyFromTo(push_vector[0], &merged.array, 0);
