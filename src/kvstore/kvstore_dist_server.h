@@ -236,19 +236,19 @@ class KVStoreDistServer {
         size_t size = dist.shape().Size();
         // testing0
         real_t* data0 = dist.data().dptr<real_t>();
-        std::vector<real_t> varray0(data, data + size);
+        std::vector<real_t> varray0(data0, data0 + size);
         LG << "original:" << varray0[0] << " [1]" << varray0[1];
 
         dist -= v;
         // testing1
         real_t* data1 = dist.data().dptr<real_t>();
-        std::vector<real_t> varray1(data, data + size);
+        std::vector<real_t> varray1(data1, data1 + size);
         LG << "minus:" << varray1[0] << " [1]" << varray1[1];
 
         dist *= dist;
         // testing1
         real_t* data2 = dist.data().dptr<real_t>();
-        std::vector<real_t> varray2(data, data + size);
+        std::vector<real_t> varray2(data2, data2 + size);
         LG << "multiple:" << varray2[0] << " [1]" << varray2[1];
 
         // get distance's data and reshape to 1-d
