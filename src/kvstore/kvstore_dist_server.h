@@ -251,13 +251,13 @@ class KVStoreDistServer {
         LG <<"score " <<score;
       }
       // store <index, score> pair into vector<int>
-      // idx_score_vec.push_back(std::make_pair(i, score));
+      idx_score_vec.push_back(std::make_pair(i, score));
     }
 
     // sort vector
-    // std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
-    //     return x.second < y.second;
-    // });
+    std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
+        return x.second < y.second;
+    });
 
     // get m-q-2 small vector
     // CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
@@ -270,7 +270,7 @@ class KVStoreDistServer {
     // merged->array *= ps::NumWorkers();
     // merged->array /= ps::NumWorkers() - bzt_num - 2;
 
-    ApplyUpdates(key, merged, stored, server);
+    ApplyUpdates(key, &merged, stored, server);
   }
 
 
