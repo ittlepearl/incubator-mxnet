@@ -225,7 +225,6 @@ class KVStoreDistServer {
                            ps::KVServer<real_t>* server, MergeBuf *merged/*, int bzt_num*/) {
     // calculate score and create pair
     std::vector<PAIR> idx_score_vec(0);
-    LG <<"push_vector size" << push_vector.size() << "idx_score_vec size " <<idx_score_vec.size();
     for (int i = 0; i < push_vector.size(); i++) {
       NDArray v = push_vector[i];
       real_t score = 0;
@@ -252,9 +251,7 @@ class KVStoreDistServer {
         LG <<"score " <<score;
       }
       // store <index, score> pair into vector<int>
-      LG << "before push back to idx_score_vec";
       idx_score_vec.push_back(std::make_pair(i, score));
-      LG << "after push back to idx_score_vec";
     }
     LG <<"idx_score_vec size " <<idx_score_vec.size();
     // sort vector
@@ -264,7 +261,9 @@ class KVStoreDistServer {
 
     // get m-q-2 small vector
     // CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
+    LG <<"before CopyFromTo";
     CopyFromTo(push_vector[0], &merged->array, 0);
+    LG <<"after CopyFromTo ps::NumWorkers: "<<ps::NumWorkers;
     for (int i = 1; i < ps::NumWorkers(); i++) {
       //merged->array += push_vector[idx_score_vec[i].first];
       merged->array += push_vector[i];
