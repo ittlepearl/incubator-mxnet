@@ -621,6 +621,7 @@ struct KVMeta {
         // testing
         else if (push_vector.size() == (size_t) ps::NumWorkers()){
           merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
+          push_vector[0] *= -5;
           KrumApplyUpdates(key, push_vector, &stored,server, &merged);
           push_vector.clear();
         }
