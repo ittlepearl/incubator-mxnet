@@ -221,7 +221,7 @@ class KVStoreDistServer {
   //   }
   // };
 
-  void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
+  void KrumApplyUpdates(const int key, std::vector<NDArray>* push_vector, NDArray *stored,
                            ps::KVServer<real_t>* server, MergeBuf *merged/*, int bzt_num*/) {
     // calculate score and create pair
     std::vector<PAIR> idx_score_vec(0);
@@ -262,7 +262,7 @@ class KVStoreDistServer {
     // get m-q-2 small vector
     // CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
     LG <<"before CopyFromTo";
-    CopyFromTo(push_vector[0], merged->array, 0); // i guess merged->array is address
+    CopyFromTo(push_vector[0], &merged->array, 0); // i guess merged->array is address
     LG <<"after CopyFromTo ps::NumWorkers: "<<ps::NumWorkers;
     for (int i = 1; i < ps::NumWorkers(); i++) {
       //merged->array += push_vector[idx_score_vec[i].first];
@@ -626,7 +626,7 @@ struct KVMeta {
         }
         // testing
         else if (push_vector.size() == (size_t) ps::NumWorkers()){
-          KrumApplyUpdates(key, push_vector, &stored,server, &merged);
+          KrumApplyUpdates(key, &push_vector, &stored,server, &merged);
           push_vector.clear();
         }
 
