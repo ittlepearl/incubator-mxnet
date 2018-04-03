@@ -240,7 +240,6 @@ class KVStoreDistServer {
         // TBlob data = dist.data();
         // data = data.FlatTo1D();
         size_t size = dist.shape().Size();
-        LG <<"size_t " <<size;
         real_t* data = dist.data().dptr<real_t>();
         std::vector<real_t> varray(data, data + size);
 
@@ -248,12 +247,10 @@ class KVStoreDistServer {
         for (auto& n : varray){
           score += n;
         }
-        LG <<"score " <<score;
       }
       // store <index, score> pair into vector<int>
       idx_score_vec.push_back(std::make_pair(i, score));
     }
-    LG <<"idx_score_vec size " <<idx_score_vec.size();
     // sort vector
     std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
         return x.second < y.second;
@@ -261,14 +258,11 @@ class KVStoreDistServer {
 
     // get m-q-2 small vector
     // CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
-    LG <<"before CopyFromTo";
     CopyFromTo(push_vector[0], &merged->array, 0); // seg fault here --> merged->array is none
-    LG <<"after CopyFromTo ps::NumWorkers: "<<ps::NumWorkers;
     for (int i = 1; i < ps::NumWorkers(); i++) {
       //merged->array += push_vector[idx_score_vec[i].first];
       merged->array += push_vector[i];
     }
-    LG <<"before ApplyUpdates";
     // // scale the array
     // merged->array *= ps::NumWorkers();
     // merged->array /= ps::NumWorkers() - bzt_num - 2;
