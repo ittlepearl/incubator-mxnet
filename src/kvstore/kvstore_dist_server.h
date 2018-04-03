@@ -221,18 +221,18 @@ class KVStoreDistServer {
   //   }
   // };
 
-  void KrumApplyUpdates(const int key, std::vector<NDArray>* push_vector, NDArray *stored,
+  void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
                            ps::KVServer<real_t>* server, MergeBuf *merged/*, int bzt_num*/) {
     // calculate score and create pair
     std::vector<PAIR> idx_score_vec(0);
-    for (int i = 0; i < push_vector->size(); i++) {
-      NDArray v = (*push_vector)[i];
+    for (int i = 0; i < push_vector.size(); i++) {
+      NDArray v = push_vector[i];
       real_t score = 0;
-      for (int j = 0; j < push_vector->size(); j++) {
+      for (int j = 0; j < push_vector.size(); j++) {
         if (i == j) continue;
 
         // calculate distance NDArray
-        NDArray dist = (*push_vector)[j];
+        NDArray dist = push_vector[j];
         dist -= v;
         dist *= dist;
 
@@ -262,11 +262,11 @@ class KVStoreDistServer {
     // get m-q-2 small vector
     // CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
     LG <<"before CopyFromTo";
-    CopyFromTo((*push_vector)[0], &merged->array, 0); // i guess merged->array is address
+    CopyFromTo(push_vector[0], &merged->array, 0); // seg fault here --> merged->array is none
     LG <<"after CopyFromTo ps::NumWorkers: "<<ps::NumWorkers;
     for (int i = 1; i < ps::NumWorkers(); i++) {
       //merged->array += push_vector[idx_score_vec[i].first];
-      merged->array += (*push_vector)[i];
+      merged->array += push_vector[i];
     }
     LG <<"before ApplyUpdates";
     // // scale the array
@@ -626,7 +626,8 @@ struct KVMeta {
         }
         // testing
         else if (push_vector.size() == (size_t) ps::NumWorkers()){
-          KrumApplyUpdates(key, &push_vector, &stored,server, &merged);
+          merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
+          KrumApplyUpdates(key, push_vector, &stored,server, &merged);
           push_vector.clear();
         }
 
