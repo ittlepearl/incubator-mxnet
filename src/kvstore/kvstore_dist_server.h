@@ -255,6 +255,10 @@ class KVStoreDistServer {
     std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
         return x.second < y.second;
     });
+    LG << "vec[0] idx:" << idx_score_vec[0].first << " score:" << idx_score_vec[0].second;
+    LG << "vec[1] idx:" << idx_score_vec[1].first << " score:" << idx_score_vec[1].second;
+    LG << "vec[2] idx:" << idx_score_vec[2].first << " score:" << idx_score_vec[2].second;
+    LG << "vec[3] idx:" << idx_score_vec[3].first << " score:" << idx_score_vec[3].second;
 
     // get m-q-2 small vector
     CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
