@@ -239,8 +239,8 @@ class KVStoreDistServer {
         // get distance's data and reshape to 1-d
         // TBlob data = dist.data();
         // data = data.FlatTo1D();
-        size_t size = dist.shape.Size();
-        LG <<"size_t" <<size_t;
+        size_t size = dist.shape().Size();
+        LG <<"size_t" <<size;
         real_t* data = dist.data().dptr<real_t>();
         std::vector<real_t> varray(data, data + size);
         LG << "vvector[0]" << varray[0];
