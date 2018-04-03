@@ -237,13 +237,18 @@ class KVStoreDistServer {
         dist *= dist;
 
         // get distance's data and reshape to 1-d
-        TBlob data = dist.data();
+        // TBlob data = dist.data();
         // data = data.FlatTo1D();
+        size_t size = dist.shape.Size();
+        LG <<"size_t" <<size_t;
+        real_t* data = dist.data().dptr<real_t>();
+        std::vector<real_t> varray(data, data + size);
+        LG << "vvector[0]" << varray[0];
 
         // sum up distance and add to score
-        for (int i = 0; i < data.Size(); i++) {
-          score += double(dist.At(index_t(i)));
-        }
+        // for (int i = 0; i < data.Size(); i++) {
+        //   score += double(dist.At(index_t(i)));
+        // }
       }
       // store <index, score> pair into vector<int>
       idx_score_vec.push_back(std::make_pair(i, score));
@@ -257,7 +262,8 @@ class KVStoreDistServer {
     // get m-q-2 small vector
     CopyFromTo(push_vector[0], &merged->array, 0);
     for (int i = 1; i < ps::NumWorkers(); i++) {
-      merged->array += push_vector[idx_score_vec[i].first];
+      //merged->array += push_vector[idx_score_vec[i].first];
+      merged->array += push_vector[i];
     }
     // // scale the array
     // merged->array *= ps::NumWorkers();
