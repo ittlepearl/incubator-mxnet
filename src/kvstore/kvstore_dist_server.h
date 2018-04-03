@@ -266,7 +266,7 @@ class KVStoreDistServer {
     LG <<"after CopyFromTo ps::NumWorkers: "<<ps::NumWorkers;
     for (int i = 1; i < ps::NumWorkers(); i++) {
       //merged->array += push_vector[idx_score_vec[i].first];
-      merged->array += push_vector[i];
+      merged->array += (*push_vector)[i];
     }
     LG <<"before ApplyUpdates";
     // // scale the array
