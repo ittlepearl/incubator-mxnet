@@ -232,7 +232,7 @@ class KVStoreDistServer {
         if (i == j) continue;
 
         // calculate distance NDArray
-        NDArray dist = push_vector[j].aux_ndarray();
+        NDArray dist = push_vector[j].data_ndarray();
         dist -= v;
         dist *= dist;
 
