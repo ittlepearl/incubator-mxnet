@@ -262,7 +262,7 @@ class KVStoreDistServer {
     // get m-q-2 small vector
     // CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
     LG <<"before CopyFromTo";
-    CopyFromTo(push_vector[0], &merged->array, 0);
+    CopyFromTo(push_vector[0], merged->array, 0); // i guess merged->array is address
     LG <<"after CopyFromTo ps::NumWorkers: "<<ps::NumWorkers;
     for (int i = 1; i < ps::NumWorkers(); i++) {
       //merged->array += push_vector[idx_score_vec[i].first];
