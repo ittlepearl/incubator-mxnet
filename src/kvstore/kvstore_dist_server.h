@@ -257,11 +257,11 @@ class KVStoreDistServer {
     });
 
     // get m-q-2 small vector
-    // CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
-    CopyFromTo(push_vector[0], &merged->array, 0); // seg fault here --> merged->array is none
-    for (int i = 1; i < ps::NumWorkers(); i++) {
-      //merged->array += push_vector[idx_score_vec[i].first];
-      merged->array += push_vector[i];
+    CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
+    // CopyFromTo(push_vector[0], &merged->array, 0); // seg fault here --> merged->array is none
+    for (int i = 1; i < ps::NumWorkers()-2; i++) {
+      merged->array += push_vector[idx_score_vec[i].first];
+      // merged->array += push_vector[i];
     }
     // // scale the array
     // merged->array *= ps::NumWorkers();
