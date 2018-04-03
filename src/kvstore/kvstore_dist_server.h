@@ -270,7 +270,7 @@ class KVStoreDistServer {
     // merged->array *= ps::NumWorkers();
     // merged->array /= ps::NumWorkers() - bzt_num - 2;
 
-    ApplyUpdates(key, &merged, stored, server);
+    ApplyUpdates(key, merged, &stored, server);
   }
 
 
