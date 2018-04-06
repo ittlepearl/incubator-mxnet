@@ -658,8 +658,9 @@ struct KVMeta {
           sum = (real_t*)malloc(alldata_v[0].vals.size()*sizeof(real_t));
           for (auto req_data : alldata_v) {
             for (int i = 0; i < sz; i++) { // sz == req_data.vals.size()
-              LG<<"req_data.vals.data())["<<i<<"]: "<<req_data.vals.data())[i];
+              LG<<"req_data.vals.data())["<<i<<"]: "<<((real_t*)req_data.vals.data())[i];
               sum[i] += ((real_t*)req_data.vals.data())[i];
+              LG<<"inside loop sum["<<i<<"]: "<<sum[i];
             }
           }
 
