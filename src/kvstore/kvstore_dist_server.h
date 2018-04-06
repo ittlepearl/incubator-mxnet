@@ -655,7 +655,7 @@ struct KVMeta {
           // construct recved
           int sz = alldata_v[0].lens[0];
           real_t* sum;
-          sum = (real_t*)calloc(alldata_v[0].vals.size()*sizeof(real_t));
+          sum = (real_t*)calloc(alldata_v[0].vals.size(), sizeof(real_t));
           for (auto req_data : alldata_v) {
             for (int i = 0; i < sz; i++) { // sz == req_data.vals.size()
               LG<<"req_data.vals.data())["<<i<<"]: "<<((real_t*)req_data.vals.data())[i];
