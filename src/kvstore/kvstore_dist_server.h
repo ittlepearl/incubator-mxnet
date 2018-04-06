@@ -643,32 +643,43 @@ struct KVMeta {
         // if (push_vector.size() < (size_t) ps::NumWorkers()){
         //   one_array.WaitToRead();
         // }
-      
+
         // initialize merged.array
-        if (merged.array.is_none()) {
-          merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
-        }
-
-        // construct recved
-        int sz = alldata_v[0].lens[0];
-        real_t* sum;
-        sum = (real_t*)malloc(alldata_v[0].vals.size()*sizeof(real_t));
-        for (auto req_data : alldata_v) {
-          for (int i = 0; i < sz; i++) { // sz == req_data.vals.size()
-            sum[i] += ((real_t*)req_data.vals.data())[i];
+        if (alldata_v.size() == (size_t) ps::NumWorkers()){
+          if (merged.array.is_none()) {
+            size_t ds[] = {(size_t)alldata_v[0].lens[0]};
+            TShape dshape(ds, ds + 1);
+            merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
           }
+
+          // construct recved
+          int sz = alldata_v[0].lens[0];
+          real_t* sum;
+          sum = (real_t*)malloc(alldata_v[0].vals.size()*sizeof(real_t));
+          for (auto req_data : alldata_v) {
+            for (int i = 0; i < sz; i++) { // sz == req_data.vals.size()
+              sum[i] += ((real_t*)req_data.vals.data())[i];
+            }
+          }
+          size_t ds[] = {(size_t)sz};
+          TShape dshape(ds, ds + 1);
+          TBlob recv_blob(&sum, dshape, cpu::kDevMask);
+          NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
+
+          CopyFromTo(recved, &merged.array, 0);
+
+          ApplyUpdates(key, &merged, &stored, server);
+          alldata_v.clear();
         }
-        size_t ds[] = {(size_t)sz};
-        TShape dshape(ds, ds + 1);
-        TBlob recv_blob(&sum, dshape, cpu::kDevMask);
-        NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
 
-        CopyFromTo(recved, &merged.array, 0);
-
-        ApplyUpdates(key, &merged, &stored, server);
-        push_vector.clear();
       } else {
         // async push
+        size_t ds[] = {(size_t)req_data.lens[0]};
+        TShape dshape(ds, ds + 1);
+        TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
+                        dshape, cpu::kDevMask);
+        NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
+
         exec_.Exec([this, key, &recved, &stored](){
             CHECK(updater_);
             updater_(key, recved, &stored);
