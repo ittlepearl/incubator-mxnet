@@ -663,7 +663,7 @@ struct KVMeta {
           }
           size_t ds[] = {(size_t)sz};
           TShape dshape(ds, ds + 1);
-          TBlob recv_blob(&sum, dshape, cpu::kDevMask);
+          TBlob recv_blob(sum, dshape, cpu::kDevMask);
           NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
 
           CopyFromTo(recved, &merged.array, 0);
