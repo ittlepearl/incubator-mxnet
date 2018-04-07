@@ -524,8 +524,8 @@ struct KVMeta {
     });
 
     // construct recved
-    for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
-      real_t* ad = (real_t*)alldata_v[i].vals.data();
+    for (int i = 0; i < ps::NumWorkers()-2; i++) { //ps::NumWorkers()-2-byt_num
+      real_t* ad = (real_t*)alldata_v[idx_score_vec[i].first].vals.data();
       for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
         res_sum[j] += ad[j];
       }
