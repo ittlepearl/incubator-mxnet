@@ -505,11 +505,11 @@ struct KVMeta {
 
     std::vector<PAIR> idx_score_vec(0);
     for (int i = 0; i < alldata_v.size(); i++) {
-      real_t* a1 = (real_t*)alldata_v[i].vals.data());
+      real_t* a1 = (real_t*)alldata_v[i].vals.data();
       real_t score = 0;
       for (int j = 0; j < alldata_v.size(); j++) {
         if (i == j) continue;
-        real_t* a2 = (real_t*)alldata_v[j].vals.data());
+        real_t* a2 = (real_t*)alldata_v[j].vals.data();
         // calculate distance NDArray
         for (int n = 0; n < nd_size; n++) {
           score += (a1[i] - a2[i])*(a1[i] - a2[i]);
@@ -525,9 +525,9 @@ struct KVMeta {
 
     // construct recved
     for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
-      real_t* ad = alldata_v[i].vals.data());
+      real_t* ad = alldata_v[i].vals.data();
       for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
-        sum[i] += ad[i];
+        res_sum[i] += ad[i];
       }
     }
 
