@@ -498,8 +498,9 @@ struct KVMeta {
 
   typedef std::pair<int, double> PAIR;
 
-  void Krum(std::vector<ps::KVPairs<real_t>> alldata_v, real_t* res_sum) {
+  void Krum(std::vector<ps::KVPairs<real_t>> alldata_v, real_t* res_sum, byzt_num) {
     // calculate score and create pair
+    CHECK_GT(ps::NumWorkers()-byzt_num-2, 0) << "number of byzantine node is too big!";
 
     int nd_size = alldata_v[0].lens[0];
 
@@ -524,7 +525,7 @@ struct KVMeta {
     });
 
     // construct recved
-    for (int i = 0; i < ps::NumWorkers()-3; i++) { //ps::NumWorkers()-2-byt_num
+    for (int i = 0; i < ps::NumWorkers() - 2 - byzt_num; i++) { //ps::NumWorkers()-2-byt_num
       real_t* ad = (real_t*)alldata_v[idx_score_vec[i].first].vals.data();
       for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
         res_sum[j] += ad[j];
@@ -534,7 +535,7 @@ struct KVMeta {
     // scale the array
     for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
       res_sum[j] *= ps::NumWorkers();
-      res_sum[j] /= ps::NumWorkers() - 3;
+      res_sum[j] /= ps::NumWorkers() - 2 - byzt_num;
     }
 
   }
@@ -624,8 +625,8 @@ struct KVMeta {
           for (int n = 0; n < alldata_v[0].vals.size(); n++) {
             a1[n] *= -10;
           }
-
-          Krum(alldata_v, res_sum);
+          int byzt_num = 1;
+          Krum(alldata_v, res_sum, byzt_num);
 
           size_t ds[] = {(size_t)alldata_v[0].lens[0]};
           TShape dshape(ds, ds + 1);
