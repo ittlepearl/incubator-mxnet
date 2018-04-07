@@ -525,7 +525,7 @@ struct KVMeta {
 
     // construct recved
     for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
-      real_t* ad = alldata_v[i].vals.data();
+      real_t* ad = (real_t*)alldata_v[i].vals.data();
       for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
         if(j < 2) {
           LG << "ad0:" << ad[0]<<"ad1:" << ad[1];
