@@ -620,7 +620,7 @@ struct KVMeta {
           // artificial byzantine by multiplying the first array by 5
           real_t* a1 = (real_t*)alldata_v[0].vals.data();
           for (int n = 0; n < alldata_v[0].vals.size(); n++) {
-            a1[n] *= -10
+            a1[n] *= -10;
           }
 
           Krum(alldata_v, res_sum);
