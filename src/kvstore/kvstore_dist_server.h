@@ -524,7 +524,7 @@ struct KVMeta {
     });
 
     // construct recved
-    for (int i = 0; i < ps::NumWorkers()-2; i++) { //ps::NumWorkers()-2-byt_num
+    for (int i = 0; i < ps::NumWorkers()-3; i++) { //ps::NumWorkers()-2-byt_num
       real_t* ad = (real_t*)alldata_v[idx_score_vec[i].first].vals.data();
       for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
         res_sum[j] += ad[j];
@@ -617,6 +617,11 @@ struct KVMeta {
           // calculate similarity score for each data using every pair
           real_t* res_sum;
           res_sum = (real_t*)calloc(alldata_v[0].vals.size(), sizeof(real_t)); // size-bzt_num-2
+          // artificial byzantine by multiplying the first array by 5
+          real_t* a1 = (real_t*)alldata_v[0].vals.data();
+          for (int n = 0; n < alldata_v[0].vals.size(); n++) {
+            a1[i] *= -10
+          }
 
           Krum(alldata_v, res_sum);
 
