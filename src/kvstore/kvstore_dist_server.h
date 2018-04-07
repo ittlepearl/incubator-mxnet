@@ -522,10 +522,7 @@ struct KVMeta {
     std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
         return x.second < y.second;
     });
-    // LG << "testing";
-    // for (auto i : idx_score_vec) {
-    //   LG << "idx:" << i.first << "  score:" << i.second;
-    // }
+
     // construct recved
     for (int i = 0; i < ps::NumWorkers()-3; i++) { //ps::NumWorkers()-2-byt_num
       real_t* ad = (real_t*)alldata_v[idx_score_vec[i].first].vals.data();
@@ -534,9 +531,11 @@ struct KVMeta {
       }
     }
 
-    // // scale the array
-    // merged->array *= ps::NumWorkers();
-    // merged->array /= ps::NumWorkers() - bzt_num - 2;
+    // scale the array
+    for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
+      res_sum[j] *= ps::NumWorkers();
+      res_sum[j] /= ps::NumWorkers() - 3;
+    }
 
   }
 
