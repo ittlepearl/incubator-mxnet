@@ -512,7 +512,7 @@ struct KVMeta {
         real_t* a2 = (real_t*)alldata_v[j].vals.data();
         // calculate distance NDArray
         for (int n = 0; n < nd_size; n++) {
-          score += (a1[i] - a2[i])*(a1[i] - a2[i]);
+          score += (a1[n] - a2[n])*(a1[n] - a2[n]);
         }
       }
       // store <index, score> pair into vector<int>
@@ -522,9 +522,10 @@ struct KVMeta {
     std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
         return x.second < y.second;
     });
-    for (auto i : idx_score_vec) {
-      LG << "idx:" << i.first << "  score:" << "i.second";
-    }
+    // LG << "testing";
+    // for (auto i : idx_score_vec) {
+    //   LG << "idx:" << i.first << "  score:" << i.second;
+    // }
     // construct recved
     for (int i = 0; i < ps::NumWorkers()-3; i++) { //ps::NumWorkers()-2-byt_num
       real_t* ad = (real_t*)alldata_v[idx_score_vec[i].first].vals.data();
