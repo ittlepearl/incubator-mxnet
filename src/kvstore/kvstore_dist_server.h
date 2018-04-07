@@ -502,6 +502,7 @@ struct KVMeta {
     // calculate score and create pair
 
     int nd_size = alldata_v[0].lens[0];
+    LG << "inside krum before score: " << (real_t*)alldata_v[0].vals.data()[0];
 
     std::vector<PAIR> idx_score_vec(0);
     for (int i = 0; i < alldata_v.size(); i++) {
@@ -523,13 +524,11 @@ struct KVMeta {
         return x.second < y.second;
     });
 
+    LG << "inside krum after sort: " << (real_t*)alldata_v[0].vals.data()[0];
     // construct recved
     for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
       real_t* ad = (real_t*)alldata_v[i].vals.data();
       for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
-        if(j < 2) {
-          LG << "ad0:" << ad[0]<<"ad1:" << ad[1];
-        }
         res_sum[i] += ad[i];
       }
     }
@@ -620,8 +619,9 @@ struct KVMeta {
           // calculate similarity score for each data using every pair
           real_t* res_sum;
           res_sum = (real_t*)calloc(alldata_v[0].vals.size(), sizeof(real_t)); // size-bzt_num-2
+          LG << "before krum: " << (real_t*)alldata_v[0].vals.data()[0];
           Krum(alldata_v, res_sum);
-          LG << "0:" << res_sum[0]<<"1:" << res_sum[1];
+          LG << "after krum: " << (real_t*)alldata_v[0].vals.data()[0];
           size_t ds[] = {(size_t)alldata_v[0].lens[0]};
           TShape dshape(ds, ds + 1);
           TBlob recv_blob(res_sum, dshape, cpu::kDevMask);
