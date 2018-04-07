@@ -214,81 +214,6 @@ class KVStoreDistServer {
     }
   }
 
-  typedef std::pair<int, double> PAIR;
-  // struct CmpByVScore {
-  //   bool operator() (const PAIR& lhs, const PAIR& rhs) {
-  //     return lhs.second < rhs.second;
-  //   }
-  // };
-
-/*
-  void KrumApplyUpdates(const int key, std::vector<NDArray> push_vector, NDArray *stored,
-                           ps::KVServer<real_t>* server, MergeBuf *merged, int bzt_num) {
-    // calculate score and create pair
-    std::vector<PAIR> idx_score_vec(0);
-    for (int i = 0; i < push_vector.size(); i++) {
-      NDArray v = push_vector[i];
-      real_t score = 0;
-      for (int j = 0; j < push_vector.size(); j++) {
-        if (i == j) continue;
-
-        // calculate distance NDArray
-        NDArray dist = push_vector[j].data_ndarray();
-        size_t size = dist.shape().Size();
-        // testing0
-        real_t* data0 = dist.data().dptr<real_t>();
-        std::vector<real_t> varray0(data0, data0 + size);
-        LG << "original:" << varray0[0] << " [1]" << varray0[1];
-
-        dist -= v;
-        // testing1
-        real_t* data1 = dist.data().dptr<real_t>();
-        std::vector<real_t> varray1(data1, data1 + size);
-        LG << "minus:" << varray1[0] << " [1]" << varray1[1];
-
-        dist *= dist;
-        // testing1
-        real_t* data2 = dist.data().dptr<real_t>();
-        std::vector<real_t> varray2(data2, data2 + size);
-        LG << "multiple:" << varray2[0] << " [1]" << varray2[1];
-
-        // get distance's data and reshape to 1-d
-
-        real_t* data = dist.data().dptr<real_t>();
-        std::vector<real_t> varray(data, data + size);
-
-        // sum up distance and add to score
-        for (auto& n : varray){
-          score += n;
-        }
-      }
-      // store <index, score> pair into vector<int>
-      idx_score_vec.push_back(std::make_pair(i, score));
-    }
-    // sort vector
-    std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
-        return x.second < y.second;
-    });
-    LG << "vec[0] idx:" << idx_score_vec[0].first << " score:" << idx_score_vec[0].second;
-    LG << "vec[1] idx:" << idx_score_vec[1].first << " score:" << idx_score_vec[1].second;
-    LG << "vec[2] idx:" << idx_score_vec[2].first << " score:" << idx_score_vec[2].second;
-    LG << "vec[3] idx:" << idx_score_vec[3].first << " score:" << idx_score_vec[3].second;
-
-    // get m-q-2 small vector
-    CopyFromTo(push_vector[idx_score_vec[0].first], &merged->array, 0);
-    // CopyFromTo(push_vector[0], &merged->array, 0); // seg fault here --> merged->array is none
-    for (int i = 1; i < ps::NumWorkers()-2; i++) {
-      merged->array += push_vector[idx_score_vec[i].first];
-      // merged->array += push_vector[i];
-    }
-    // // scale the array
-    // merged->array *= ps::NumWorkers();
-    // merged->array /= ps::NumWorkers() - bzt_num - 2;
-
-    ApplyUpdates(key, merged, stored, server);
-  }
-*/
-
   void DecodeRowIds(const ps::SArray<ps::Key> &keys, int64_t *indices,
                     const int64_t master_key, const int64_t num_rows) {
     indices[0] = 0;
@@ -570,6 +495,49 @@ struct KVMeta {
 };
 */
 
+
+  typedef std::pair<int, double> PAIR;
+
+  void Krum(std::vector<ps::KVPairs<real_t>> alldata_v, real_t* res_sum) {
+    // calculate score and create pair
+
+    int nd_size = alldata_v[0].lens[0];
+
+    std::vector<PAIR> idx_score_vec(0);
+    for (int i = 0; i < alldata_v.size(); i++) {
+      real_t* a1 = (real_t*)alldata_v[i].vals.data());
+      real_t score = 0;
+      for (int j = 0; j < alldata_v.size(); j++) {
+        if (i == j) continue;
+        real_t* a2 = (real_t*)alldata_v[j].vals.data());
+        // calculate distance NDArray
+        for (int n = 0; n < nd_size; n++) {
+          score += (a1[i] - a2[i])*(a1[i] - a2[i]);
+        }
+      }
+      // store <index, score> pair into vector<int>
+      idx_score_vec.push_back(std::make_pair(i, score));
+    }
+    // sort vector
+    std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
+        return x.second < y.second;
+    });
+
+    // construct recved
+    for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
+      real_t* ad = alldata_v[i].vals.data());
+      for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
+        sum[i] += ad[i];
+      }
+    }
+
+    // // scale the array
+    // merged->array *= ps::NumWorkers();
+    // merged->array /= ps::NumWorkers() - bzt_num - 2;
+
+  }
+
+
 // namespace mxnet
   void DataHandleDefault(const ps::KVMeta& req_meta,
                          const ps::KVPairs<real_t> &req_data,
@@ -607,13 +575,6 @@ struct KVMeta {
         // initialization
         stored = NDArray(dshape, Context());
         CopyFromTo(recved, &stored, 0);
-        /*void mxnet::CopyFromTo	(	const NDArray & 	from,
-          const NDArray * 	to,
-          int 	priority = 0
-          )
-          issue an copy operation from one NDArray to another the two ndarray can sit on different devices this operation will be scheduled by the engine
-        */
-
         server->Response(req_meta); // ?
         stored.WaitToRead();
       } else if (sync_mode_) {
@@ -652,26 +613,15 @@ struct KVMeta {
             merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
           }
 
-          // construct recved
-          int sz = alldata_v[0].lens[0];
-          real_t* sum;
-          sum = (real_t*)calloc(alldata_v[0].vals.size(), sizeof(real_t));
-          for (auto req_data : alldata_v) {
-            for (int i = 0; i < sz; i++) { // sz == req_data.vals.size()
-              //LG<<"req_data.vals.data())["<<i<<"]: "<<((real_t*)req_data.vals.data())[i];
-              sum[i] += ((real_t*)req_data.vals.data())[i];
-              //LG<<"inside loop sum["<<i<<"]: "<<sum[i];
-            }
-          }
+          // ------ KRUM ---------
+          // calculate similarity score for each data using every pair
+          real_t* res_sum;
+          res_sum = (real_t*)calloc(alldata_v[0].vals.size(), sizeof(real_t)); // size-bzt_num-2
+          Krum(alldata_v, res_sum);
 
-          // for (int i = 0; i < sz; i++) { // sz == req_data.vals.size()
-          //   LG<<"sum["<<i<<"]: "<<sum[i];
-          // }
-          LG<<"size: "<<sz;
-
-          size_t ds[] = {(size_t)sz};
+          size_t ds[] = {(size_t)alldata_v[0].lens[0]};
           TShape dshape(ds, ds + 1);
-          TBlob recv_blob(sum, dshape, cpu::kDevMask);
+          TBlob recv_blob(res_sum, dshape, cpu::kDevMask);
           NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
 
           CopyFromTo(recved, &merged.array, 0);
