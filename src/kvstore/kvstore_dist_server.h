@@ -498,7 +498,7 @@ struct KVMeta {
 
   typedef std::pair<int, double> PAIR;
 
-  void Krum(std::vector<ps::KVPairs<real_t>> alldata_v, real_t* res_sum, int byzt_num) {
+  void Krum(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
     // calculate score and create pair
     CHECK_GT(ps::NumWorkers()-byzt_num-2, 0) << "number of byzantine node is too big!";
 
@@ -623,7 +623,7 @@ struct KVMeta {
           // artificial byzantine by multiplying the first array by 5
           real_t* a1 = (real_t*)alldata_v[0].vals.data();
           for (int n = 0; n < alldata_v[0].vals.size(); n++) {
-            a1[n] *= -10;
+            a1[n] *= -100;
           }
           int byzt_num = 1;
           Krum(alldata_v, res_sum, byzt_num);
