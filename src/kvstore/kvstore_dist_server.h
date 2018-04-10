@@ -626,10 +626,11 @@ struct KVMeta {
             a1[n] *= -100;
           }
           int byzt_num = 1;
-          
+
           // Krum(alldata_v, res_sum, byzt_num);
 
           // test failure case with no Krum
+          int nd_size = alldata_v[0].lens[0];
           for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
             real_t* ad = (real_t*)alldata_v[i].vals.data();
             for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
