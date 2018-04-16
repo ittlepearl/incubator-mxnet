@@ -498,7 +498,7 @@ struct KVMeta {
 
   typedef std::pair<int, double> PAIR;
 
-  void getSortedScoreVector (const std::vector<ps::KVPairs<real_t>> &alldata_v, std::vector<PAIR>& idx_score_vec) {
+  void getSortedScoreVector (const std::vector<ps::KVPairs<real_t>> &alldata_v, std::vector<PAIR> &idx_score_vec) {
 
     int nd_size = alldata_v[0].lens[0];
 
@@ -521,6 +521,10 @@ struct KVMeta {
         return x.second < y.second;
     });
 
+    for (int i = 0; i < ps::NumWorkers(); i++) {
+      LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
+    }
+    
   }
 
   void Krum(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
@@ -529,9 +533,9 @@ struct KVMeta {
 
     std::vector<PAIR> idx_score_vec(0);
     getSortedScoreVector(alldata_v, idx_score_vec);
-    for (int i = 0; i < ps::NumWorkers(); i++) {
-      LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
-    }
+    // for (int i = 0; i < ps::NumWorkers(); i++) {
+    //   LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
+    // }
 
     int nd_size = alldata_v[0].lens[0];
     // construct recved
