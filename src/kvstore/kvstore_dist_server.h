@@ -528,6 +528,9 @@ struct KVMeta {
 
     std::vector<PAIR> idx_score_vec(0);
     getSortedScoreVector(alldata_v, idx_score_vec);
+    for (int i = 0; i < ps::NumWorkers(); i++)  {
+      LG << "idx_score_vec[" << i "]: " << idx_score_vec[i];
+    }
 
     int nd_size = alldata_v[0].lens[0];
     // construct recved
@@ -547,7 +550,7 @@ struct KVMeta {
   }
 
   void TrimmedMean(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
-
+    CHECK_GT(ps::NumWorkers() - 2 * byzt_num, 0) << "number of byzantine node is too big!";
   }
 
 
