@@ -521,9 +521,9 @@ struct KVMeta {
         return x.second < y.second;
     });
 
-    for (int i = 0; i < ps::NumWorkers(); i++) {
-      LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
-    }
+    // for (int i = 0; i < ps::NumWorkers(); i++) {
+    //   LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
+    // }
 
   }
 
@@ -532,24 +532,12 @@ struct KVMeta {
     CHECK_GT(ps::NumWorkers()-byzt_num-2, 0) << "number of byzantine node is too big!";
     int nd_size = alldata_v[0].lens[0];
     std::vector<PAIR> idx_score_vec(0);
-    // getSortedScoreVector(alldata_v, idx_score_vec);
+
+    getSortedScoreVector(alldata_v, idx_score_vec);
     // for (int i = 0; i < ps::NumWorkers(); i++) {
     //   LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
     // }
-    for (int i = 0; i < alldata_v.size(); i++) {
-      real_t* a1 = (real_t*)alldata_v[i].vals.data();
-      real_t score = 0;
-      for (int j = 0; j < alldata_v.size(); j++) {
-        if (i == j) continue;
-        real_t* a2 = (real_t*)alldata_v[j].vals.data();
-        // calculate distance NDArray
-        for (int n = 0; n < nd_size; n++) {
-          score += (a1[n] - a2[n])*(a1[n] - a2[n]);
-        }
-      }
-      // store <index, score> pair into vector<int>
-      idx_score_vec.push_back(std::make_pair(i, score));
-    }
+
     // sort vector
     std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
         return x.second < y.second;
@@ -665,14 +653,14 @@ struct KVMeta {
 
           Krum(alldata_v, res_sum, byzt_num);
 
-          // test failure case with no Krum
-          int nd_size = alldata_v[0].lens[0];
-          for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
-            real_t* ad = (real_t*)alldata_v[i].vals.data();
-            for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
-              res_sum[j] += ad[j];
-            }
-          }
+          // // test failure case with no Krum
+          // int nd_size = alldata_v[0].lens[0];
+          // for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
+          //   real_t* ad = (real_t*)alldata_v[i].vals.data();
+          //   for (int j = 0; j < nd_size; j++) { // sz == req_data.vals.size()
+          //     res_sum[j] += ad[j];
+          //   }
+          // }
 
           size_t ds[] = {(size_t)alldata_v[0].lens[0]};
           TShape dshape(ds, ds + 1);
