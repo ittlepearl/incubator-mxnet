@@ -529,7 +529,7 @@ struct KVMeta {
 
     std::vector<PAIR> idx_score_vec(0);
     getSortedScoreVector(alldata_v, idx_score_vec);
-    for (int i = 0; i < ps::NumWorkers; i++) {
+    for (int i = 0; i < ps::NumWorkers(); i++) {
       LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
     }
 
