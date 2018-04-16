@@ -637,7 +637,7 @@ struct KVMeta {
           }
           int byzt_num = 1;
 
-          // Krum(alldata_v, res_sum, byzt_num);
+          Krum(alldata_v, res_sum, byzt_num);
 
           // test failure case with no Krum
           int nd_size = alldata_v[0].lens[0];
