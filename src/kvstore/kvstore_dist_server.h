@@ -530,7 +530,7 @@ struct KVMeta {
   void Krum(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
     // calculate score and create pair
     CHECK_GT(ps::NumWorkers()-byzt_num-2, 0) << "number of byzantine node is too big!";
-
+    int nd_size = alldata_v[0].lens[0];
     std::vector<PAIR> idx_score_vec(0);
     // getSortedScoreVector(alldata_v, idx_score_vec);
     // for (int i = 0; i < ps::NumWorkers(); i++) {
@@ -555,7 +555,7 @@ struct KVMeta {
         return x.second < y.second;
     });
 
-    int nd_size = alldata_v[0].lens[0];
+
     // construct recved
     for (int i = 0; i < ps::NumWorkers() - 2 - byzt_num; i++) { //ps::NumWorkers()-2-byt_num
       real_t* ad = (real_t*)alldata_v[idx_score_vec[i].first].vals.data();
