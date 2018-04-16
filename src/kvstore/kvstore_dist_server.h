@@ -521,29 +521,16 @@ struct KVMeta {
         return x.second < y.second;
     });
 
-    // for (int i = 0; i < ps::NumWorkers(); i++) {
-    //   LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
-    // }
-
   }
 
   void Krum(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
     // calculate score and create pair
     CHECK_GT(ps::NumWorkers()-byzt_num-2, 0) << "number of byzantine node is too big!";
-    int nd_size = alldata_v[0].lens[0];
+
     std::vector<PAIR> idx_score_vec(0);
-
     getSortedScoreVector(alldata_v, idx_score_vec);
-    // for (int i = 0; i < ps::NumWorkers(); i++) {
-    //   LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
-    // }
 
-    // sort vector
-    std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
-        return x.second < y.second;
-    });
-
-
+    int nd_size = alldata_v[0].lens[0];
     // construct recved
     for (int i = 0; i < ps::NumWorkers() - 2 - byzt_num; i++) { //ps::NumWorkers()-2-byt_num
       real_t* ad = (real_t*)alldata_v[idx_score_vec[i].first].vals.data();
@@ -562,6 +549,28 @@ struct KVMeta {
 
   void TrimmedMean(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
     CHECK_GT(ps::NumWorkers() - 2 * byzt_num, 0) << "number of byzantine node is too big!";
+
+    int nd_size = alldata_v[0].lens[0];
+    int count = ps::NumWorkers()- 2 * byzt_num;
+
+    for (int dim = 0; dim < nd_size; dim++) {
+      std::vector<double> one_dim_vec(0);
+      for (int i = 0; i < ps::NumWorkers(); i++) {
+        real_t* data = (real_t*)alldata_v[i].vals.data();
+        one_dim_vec.push_back(data[dim]);
+      }
+      std::sort(one_dim_vec.begin(), one_dim_vec.end());
+
+      // sum up b-trimmed
+      for (int k = byzt_num; k < ps::NumWorkers() - byzt_num; k++) {
+        res_sum[dim] += one_dim_vec[k];
+      }
+
+      // calculate mean
+      res_sum[dim] /= count;
+    }
+
+
   }
 
 
