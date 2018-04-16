@@ -524,7 +524,7 @@ struct KVMeta {
     for (int i = 0; i < ps::NumWorkers(); i++) {
       LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
     }
-    
+
   }
 
   void Krum(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
@@ -532,10 +532,28 @@ struct KVMeta {
     CHECK_GT(ps::NumWorkers()-byzt_num-2, 0) << "number of byzantine node is too big!";
 
     std::vector<PAIR> idx_score_vec(0);
-    getSortedScoreVector(alldata_v, idx_score_vec);
+    // getSortedScoreVector(alldata_v, idx_score_vec);
     // for (int i = 0; i < ps::NumWorkers(); i++) {
     //   LG  << i << "th :" << "  idx:" << idx_score_vec[i].first << " score:" <<  idx_score_vec[i].second;
     // }
+    for (int i = 0; i < alldata_v.size(); i++) {
+      real_t* a1 = (real_t*)alldata_v[i].vals.data();
+      real_t score = 0;
+      for (int j = 0; j < alldata_v.size(); j++) {
+        if (i == j) continue;
+        real_t* a2 = (real_t*)alldata_v[j].vals.data();
+        // calculate distance NDArray
+        for (int n = 0; n < nd_size; n++) {
+          score += (a1[n] - a2[n])*(a1[n] - a2[n]);
+        }
+      }
+      // store <index, score> pair into vector<int>
+      idx_score_vec.push_back(std::make_pair(i, score));
+    }
+    // sort vector
+    std::sort(idx_score_vec.begin(), idx_score_vec.end(), [](const PAIR &x, const PAIR &y) -> int {
+        return x.second < y.second;
+    });
 
     int nd_size = alldata_v[0].lens[0];
     // construct recved
