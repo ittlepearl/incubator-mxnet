@@ -39,6 +39,7 @@
 
 #include <utility>    //pair
 #include <algorithm>  // sort
+#include <cmath>
 
 
 namespace mxnet {
@@ -569,8 +570,45 @@ struct KVMeta {
       // calculate mean
       res_sum[dim] /= count;
     }
+  }
 
+  void CongAlgo(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
+    CHECK_GT(ps::NumWorkers() - 2 * byzt_num, 0) << "number of byzantine node is too big!";
+    int nd_size = alldata_v[0].lens[0];
+    int trimmedcount = ps::NumWorkers()- 2 * byzt_num;
 
+    for (int dim = 0; dim < nd_size; dim++) {
+      std::vector<double> one_dim_vec(0);
+      for (int i = 0; i < ps::NumWorkers(); i++) {
+        real_t* data = (real_t*)alldata_v[i].vals.data();
+        one_dim_vec.push_back(data[dim]);
+      }
+      std::sort(one_dim_vec.begin(), one_dim_vec.end());
+
+      // calculate b-trimmed mean
+      real_t btmean = 0;
+      for (int k = byzt_num; k < ps::NumWorkers() - byzt_num; k++) {
+        btmean += one_dim_vec[k];
+      }
+      btmean /= trimmedcount;
+
+      // get n-q nearest neighbors
+      int count = 0;
+      int start = ps::NumWorkers()/2;
+      int end = ps::NumWorkers()/2 + 1;
+      while (count < ps::NumWorkers() - byzt_num) {
+        if (end >= ps::NumWorkers() || start >= 0 && abs(one_dim_vec[start] - btmean) < abs(one_dim_vec[end] - btmean)) {
+          res_sum[dim] += one_dim_vec[start];
+          start --;
+        }
+        else if (start < 0 || end < ps::NumWorkers() && abs(one_dim_vec[start] - btmean) >= abs(one_dim_vec[end] - btmean)){
+          res_sum[dim] += one_dim_vec[end];
+          end++;
+        }
+        count ++;
+      }
+      res_sum[dim] /= count;
+    }
   }
 
 
@@ -649,7 +687,7 @@ struct KVMeta {
             merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
           }
 
-          // ------ KRUM ---------
+
           // calculate similarity score for each data using every pair
           real_t* res_sum;
           res_sum = (real_t*)calloc(alldata_v[0].vals.size(), sizeof(real_t)); // size-bzt_num-2
@@ -660,11 +698,15 @@ struct KVMeta {
           }
           int byzt_num = 1;
 
+          // ------ KRUM ---------
           // Krum(alldata_v, res_sum, byzt_num);
-
+          // ------ TrimmedMean ---------
           TrimmedMean(alldata_v, res_sum, byzt_num);
 
-          // // test failure case with no Krum
+          // ------ CongAlgo -----
+          CongAlgo(alldata_v, res_sum, byzt_num);
+
+          // ------- test failure case with no Krum -------
           // int nd_size = alldata_v[0].lens[0];
           // for (int i = 0; i < ps::NumWorkers(); i++) { //ps::NumWorkers()-2-byt_num
           //   real_t* ad = (real_t*)alldata_v[i].vals.data();
