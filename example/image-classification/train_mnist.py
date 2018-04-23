@@ -52,10 +52,10 @@ def get_mnist_iter(args, kv):
     """
     create data iterator with NDArrayIter
     """
-   (train_lbl, train_img) = read_data(
-           'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
-   (val_lbl, val_img) = read_data(
-           't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
+    (train_lbl, train_img) = read_data(
+            'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
+    (val_lbl, val_img) = read_data(
+            't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
     #print ("original train:", len(train_lbl1), len(train_img1))
     #print ("original train:", len(train_lbl1), len(train_img1))
     # cifar10_train = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=None)
