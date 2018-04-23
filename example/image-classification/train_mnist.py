@@ -48,27 +48,29 @@ def to4d(img):
     """
     return img.reshape(img.shape[0], 1, 28, 28).astype(np.float32)/255
 
+def transform(data, label):
+            data = mx.image.imresize(data, 224, 224)
+            data = mx.nd.transpose(data, (2,0,1))
+            data = data.astype(np.float32)
+            return data, label
+
 def get_mnist_iter(args, kv):
     """
     create data iterator with NDArrayIter
     """
-    (train_lbl, train_img) = read_data(
-            'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
-    (val_lbl, val_img) = read_data(
-            't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
-    #print ("original train:", len(train_lbl1), len(train_img1))
-    #print ("original train:", len(train_lbl1), len(train_img1))
-    # cifar10_train = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=None)
-    # train_lbl = cifar10_train._label
-    # train_img = cifar10_train._data
-    # cifar10_val = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=None)
-    # val_lbl = cifar10_val._label
-    # val_img = cifar10_val._data
+    # (train_lbl, train_img) = read_data(
+    #         'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
+    # (val_lbl, val_img) = read_data(
+    #         't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
+    # train = mx.io.NDArrayIter(
+    #     to4d(train_img), train_lbl, args.batch_size, shuffle=True)
+    # val = mx.io.NDArrayIter(
+    #     to4d(val_img), val_lbl, args.batch_size)
 
-    train = mx.io.NDArrayIter(
-        to4d(train_img), train_lbl, args.batch_size, shuffle=True)
-    val = mx.io.NDArrayIter(
-        to4d(val_img), val_lbl, args.batch_size)
+    train = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(train=True, transform=transform),
+                            args.batch_size, shuffle=True, last_batch='rollover')
+    val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(train=False, transform=transform),
+                            args.batch_size, shuffle=False, last_batch='rollover')
     return (train, val)
 
 if __name__ == '__main__':
