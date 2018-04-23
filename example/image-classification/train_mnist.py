@@ -62,15 +62,21 @@ def get_mnist_iter(args, kv):
     #         'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
     # (val_lbl, val_img) = read_data(
     #         't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
-    # train = mx.io.NDArrayIter(
-    #     to4d(train_img), train_lbl, args.batch_size, shuffle=True)
-    # val = mx.io.NDArrayIter(
-    #     to4d(val_img), val_lbl, args.batch_size)
 
-    train = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform),
-                            args.batch_size, shuffle=True, last_batch='rollover')
-    val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform),
-                            args.batch_size, shuffle=False, last_batch='rollover')
+    #
+    # train = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform),
+    #                         args.batch_size, shuffle=True, last_batch='rollover')
+    # val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform),
+    #                         args.batch_size, shuffle=False, last_batch='rollover')
+
+    train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform)
+    val_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
+
+    train = mx.io.NDArrayIter(
+        to4d(train_cifar10._data), train_cifar10._label, args.batch_size, shuffle=True)
+    val = mx.io.NDArrayIter(
+        to4d(val_cifar10._data), val_cifar10._label, args.batch_size)
+
     return (train, val)
 
 if __name__ == '__main__':
