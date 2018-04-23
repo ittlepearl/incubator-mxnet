@@ -85,7 +85,7 @@ USE_NCCL_PATH = NONE
 # whether use opencv during compilation
 # you can disable it, however, you will not able to use
 # imbin iterator
-USE_OPENCV = 0
+USE_OPENCV = 1
 
 #whether use libjpeg-turbo for image decode without OpenCV wrapper
 USE_LIBJPEG_TURBO = 0
