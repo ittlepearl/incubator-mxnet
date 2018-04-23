@@ -67,9 +67,9 @@ def get_mnist_iter(args, kv):
     # val = mx.io.NDArrayIter(
     #     to4d(val_img), val_lbl, args.batch_size)
 
-    train = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(train=True, transform=transform),
+    train = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform),
                             args.batch_size, shuffle=True, last_batch='rollover')
-    val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(train=False, transform=transform),
+    val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform),
                             args.batch_size, shuffle=False, last_batch='rollover')
     return (train, val)
 
