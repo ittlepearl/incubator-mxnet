@@ -701,7 +701,7 @@ struct KVMeta {
           // ------ KRUM ---------
           // Krum(alldata_v, res_sum, byzt_num);
           // ------ TrimmedMean ---------
-          TrimmedMean(alldata_v, res_sum, byzt_num);
+          // TrimmedMean(alldata_v, res_sum, byzt_num);
 
           // ------ CongAlgo -----
           CongAlgo(alldata_v, res_sum, byzt_num);
