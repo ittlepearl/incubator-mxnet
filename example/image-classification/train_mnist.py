@@ -52,18 +52,19 @@ def get_mnist_iter(args, kv):
     """
     create data iterator with NDArrayIter
     """
-#    (train_lbl, train_img) = read_data(
-#            'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
-#    (val_lbl, val_img) = read_data(
-#            't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
-    cifar10_train = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=None)
-    train_lbl = cifar10_train._label
-    train_img = cifar10_train._data
-    cifar10_val = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=None)
-    val_lbl = cifar10_val._label
-    val_img = cifar10_val._data
-#    (val_lbl, val_img) = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=Falsecd, transform=None)
-    
+   (train_lbl, train_img) = read_data(
+           'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
+   (val_lbl, val_img) = read_data(
+           't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
+    #print ("original train:", len(train_lbl1), len(train_img1))
+    #print ("original train:", len(train_lbl1), len(train_img1))
+    # cifar10_train = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=None)
+    # train_lbl = cifar10_train._label
+    # train_img = cifar10_train._data
+    # cifar10_val = mx.gluon.data.vision.datasets.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=None)
+    # val_lbl = cifar10_val._label
+    # val_img = cifar10_val._data
+
     train = mx.io.NDArrayIter(
         to4d(train_img), train_lbl, args.batch_size, shuffle=True)
     val = mx.io.NDArrayIter(
@@ -90,7 +91,7 @@ if __name__ == '__main__':
         batch_size     = 64,
         disp_batches   = 100,
         num_epochs     = 20,
-        lr             = .05,
+        lr             = .01,
         lr_step_epochs = '10'
     )
     args = parser.parse_args()
