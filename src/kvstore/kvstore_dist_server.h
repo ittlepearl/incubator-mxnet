@@ -652,20 +652,20 @@ struct KVMeta {
         server->Response(req_meta); // ?
         stored.WaitToRead();
       } else if (sync_mode_) {
-         /* ------ original code ------- /
+         /* ------ baseline------- */
         // synced push -- use merfed_buf_:It represents values from different workers being merged.
-        auto& merged = merge_buf_[key];
-        if (merged.array.is_none()) {
-          merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
-        }
-        if (merged.request.size() == 0) {
-          CopyFromTo(recved, &merged.array, 0);
-        } else {
-          merged.array += recved;
-        }
-        merged.request.push_back(req_meta);
-        ApplyUpdates(key, &merged, &stored, server);
-        --------- original code ends ----------*/
+        // auto& merged = merge_buf_[key];
+        // if (merged.array.is_none()) {
+        //   merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
+        // }
+        // if (merged.request.size() == 0) {
+        //   CopyFromTo(recved, &merged.array, 0);
+        // } else {
+        //   merged.array += recved;
+        // }
+        // merged.request.push_back(req_meta);
+        // ApplyUpdates(key, &merged, &stored, server);
+        /* --------- baseline----------*/
 
         auto& merged = merge_buf_[key];
         merged.request.push_back(req_meta);
@@ -700,6 +700,7 @@ struct KVMeta {
 
           // ------ KRUM ---------
           // Krum(alldata_v, res_sum, byzt_num);
+
           // ------ TrimmedMean ---------
           // TrimmedMean(alldata_v, res_sum, byzt_num);
 

@@ -46,10 +46,10 @@ def to4d(img):
     """
     reshape to 4D arrays
     """
-    return img.reshape(img.shape[0], 1, 28, 28).astype(np.float32)/255
+    return img.reshape(img.shape[0], 1, 32, 32).astype(np.float32)/255
 
 def transform(data, label):
-            data = mx.image.imresize(data, 224, 224)
+            data = mx.image.imresize(data, 32, 32)
             data = mx.nd.transpose(data, (2,0,1))
             data = data.astype(np.float32)
             return data, label
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     fit.add_fit_args(parser)
     parser.set_defaults(
         # network
-        network        = 'mlp',
+        network        = 'lenet',
         # train
         gpus           = None,
         batch_size     = 64,
