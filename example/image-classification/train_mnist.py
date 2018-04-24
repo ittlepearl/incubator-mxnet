@@ -58,18 +58,18 @@ def get_mnist_iter(args, kv):
     """
     create data iterator with NDArrayIter
     """
-    # (train_lbl, train_img) = read_data(
-    #         'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
+    (train_lbl1, train_img1) = read_data(
+            'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
     # (val_lbl, val_img) = read_data(
     #         't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
-
+    print (train_img1.shape)
     #
     # train = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform),
     #                         args.batch_size, shuffle=True, last_batch='rollover')
     # val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform),
     #                         args.batch_size, shuffle=False, last_batch='rollover')
 
-    train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform)
+    train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True)
     val_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
     print (train_cifar10._data.shape)
     train = mx.io.NDArrayIter(
