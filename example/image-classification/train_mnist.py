@@ -68,7 +68,7 @@ def get_mnist_iter(args, kv):
     create data iterator with NDArrayIter
     """
     # (train_lbl1, train_img1) = read_data(
-            'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
+    #         'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
     # (val_lbl, val_img) = read_data(
     #         't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
     # print (train_img1.shape)
