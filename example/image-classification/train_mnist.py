@@ -58,10 +58,10 @@ def swap(data):
 
 def transform(data, label):
             #data = mx.image.imresize(data, 32, 32)
-            data = data.transpose((2,0,1))
+            res = data.transpose((2,0,1))
             #data = mx.nd.swapaxes(data, 0, 2)
-            data = data.astype(np.float32)
-            return data, label
+            res = res.astype(np.float32)
+            return res, label
 
 def get_mnist_iter(args, kv):
     """
@@ -80,10 +80,9 @@ def get_mnist_iter(args, kv):
 
     train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform)
     val_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
-    print (train_cifar10._data.shape)
-    print (swap(train_cifar10._data).shape)
-    print (train_cifar10._data.mean)
-    print (swap(train_cifar10._data).mean)
+    print ("original: ", train_cifar10._data.shape)
+    print ("swap: ", swap(train_cifar10._data).shape)
+    print ("transform: ", transform(train_cifar10._data).shape)
     train = mx.io.NDArrayIter(
         swap(train_cifar10._data), train_cifar10._label, args.batch_size, shuffle=True)
     val = mx.io.NDArrayIter(
