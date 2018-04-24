@@ -54,7 +54,7 @@ def swap(data):
     """
     res = data.swapaxes(2, 3)
     res = res.swapaxes(1, 2)
-    res = res.astype(np.float32)
+    res = res.astype(np.float32)/255
     return res
 
 def transform(data):
