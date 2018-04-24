@@ -72,6 +72,7 @@ def get_mnist_iter(args, kv):
     train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform)
     val_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
     print (train_cifar10._data.shape)
+    print (to4d(train_cifar10._data).shape)
     train = mx.io.NDArrayIter(
         train_cifar10._data, train_cifar10._label, args.batch_size, shuffle=True)
     val = mx.io.NDArrayIter(
