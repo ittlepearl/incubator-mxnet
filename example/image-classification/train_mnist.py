@@ -67,11 +67,11 @@ def get_mnist_iter(args, kv):
     """
     create data iterator with NDArrayIter
     """
-    (train_lbl1, train_img1) = read_data(
+    # (train_lbl1, train_img1) = read_data(
             'train-labels-idx1-ubyte.gz', 'train-images-idx3-ubyte.gz')
     # (val_lbl, val_img) = read_data(
     #         't10k-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz')
-    print (train_img1.shape)
+    # print (train_img1.shape)
     #
     # train = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform),
     #                         args.batch_size, shuffle=True, last_batch='rollover')
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--num-classes', type=int, default=10,
                         help='the number of classes')
-    parser.add_argument('--num-examples', type=int, default=60000,
+    parser.add_argument('--num-examples', type=int, default=50000,
                         help='the number of training examples')
 
     parser.add_argument('--add_stn',  action="store_true", default=False, help='Add Spatial Transformer Network Layer (lenet only)')
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         batch_size     = 64,
         disp_batches   = 100,
         num_epochs     = 20,
-        lr             = .05,
+        lr             = .01,
         lr_step_epochs = '10'
     )
     args = parser.parse_args()
