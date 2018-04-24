@@ -52,7 +52,7 @@ def swap(data):
     """
     reshape to 2nd and 4th axes
     """
-    res = data.swapaxes(data, 1, 3)
+    res = data.swapaxes(1, 3)
     res = res.astype(np.float32)
     return res
 
