@@ -111,9 +111,9 @@ if __name__ == '__main__':
         # train
         gpus           = None,
         batch_size     = 64,
-        disp_batches   = 100,
-        num_epochs     = 20,
-        lr             = .05,
+        disp_batches   = 50,
+        num_epochs     = 10,
+        lr             = .01,
         lr_step_epochs = '10'
     )
     args = parser.parse_args()
@@ -124,4 +124,4 @@ if __name__ == '__main__':
     sym = net.get_symbol(**vars(args))
 
     # train
-    fit.fit(args, sym, get_mnist_iter)
+    fit.fit(args, sym, get_mnist_iter, epoch_end_callback=checkpoint)
