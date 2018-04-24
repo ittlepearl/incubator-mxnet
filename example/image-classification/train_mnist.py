@@ -82,7 +82,7 @@ def get_mnist_iter(args, kv):
     val_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
     print ("original: ", train_cifar10._data.shape)
     swapped = swap(train_cifar10._data)
-    swappedval = swap(vak_cifar10._data)
+    swappedval = swap(val_cifar10._data)
     print ("swap: ", swapped.shape)
     #print ("transform: ", transform(train_cifar10._data).shape)
     train = mx.io.NDArrayIter(
