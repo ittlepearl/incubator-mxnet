@@ -52,14 +52,14 @@ def swap(data):
     """
     reshape to 2nd and 4th axes
     """
-    res = mx.nd.swapaxes(data, 1, 3)
+    res = data.swapaxes(data, 1, 3)
     res = res.astype(np.float32)
     return res
 
 def transform(data, label):
             #data = mx.image.imresize(data, 32, 32)
-            #data = mx.nd.transpose(data, (2,0,1))
-            data = mx.nd.swapaxes(data, 0, 2)
+            data = data.transpose((2,0,1))
+            #data = mx.nd.swapaxes(data, 0, 2)
             data = data.astype(np.float32)
             return data, label
 
@@ -85,9 +85,9 @@ def get_mnist_iter(args, kv):
     print (train_cifar10._data.mean)
     print (swap(train_cifar10._data).mean)
     train = mx.io.NDArrayIter(
-        train_cifar10._data, train_cifar10._label, args.batch_size, shuffle=True)
+        swap(train_cifar10._data), train_cifar10._label, args.batch_size, shuffle=True)
     val = mx.io.NDArrayIter(
-        val_cifar10._data, val_cifar10._label, args.batch_size)
+        swap(val_cifar10._data), val_cifar10._label, args.batch_size)
 
     return (train, val)
 
