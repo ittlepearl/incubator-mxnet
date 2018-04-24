@@ -49,8 +49,8 @@ def to4d(img):
     return img.reshape(img.shape[0], 1, 32, 32).astype(np.float32)/255
 
 def transform(data, label):
-            data = mx.image.imresize(data, 32, 32)
-            # data = mx.nd.transpose(data, (2,0,1))
+            #data = mx.image.imresize(data, 32, 32)
+            data = mx.nd.transpose(data, (2,0,1))
             data = data.astype(np.float32)
             return data, label
 
@@ -69,13 +69,13 @@ def get_mnist_iter(args, kv):
     # val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform),
     #                         args.batch_size, shuffle=False, last_batch='rollover')
 
-    train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True)
+    train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=transform)
     val_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
     print (train_cifar10._data.shape)
     train = mx.io.NDArrayIter(
-        to4d(train_cifar10._data), train_cifar10._label, args.batch_size, shuffle=True)
+        train_cifar10._data, train_cifar10._label, args.batch_size, shuffle=True)
     val = mx.io.NDArrayIter(
-        to4d(val_cifar10._data), val_cifar10._label, args.batch_size)
+        val_cifar10._data, val_cifar10._label, args.batch_size)
 
     return (train, val)
 
