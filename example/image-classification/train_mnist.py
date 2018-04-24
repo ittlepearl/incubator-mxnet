@@ -124,4 +124,4 @@ if __name__ == '__main__':
     sym = net.get_symbol(**vars(args))
 
     # train
-    fit.fit(args, sym, get_mnist_iter, epoch_end_callback=checkpoint)
+    fit.fit(args, sym, get_mnist_iter, epoch_end_callback)
