@@ -50,7 +50,8 @@ def to4d(img):
 
 def transform(data, label):
             #data = mx.image.imresize(data, 32, 32)
-            data = mx.nd.transpose(data, (2,0,1))
+            #data = mx.nd.transpose(data, (2,0,1))
+            data = mx.nd.swapaxes(data, 0, 2)
             data = data.astype(np.float32)
             return data, label
 
