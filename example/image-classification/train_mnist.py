@@ -111,8 +111,8 @@ if __name__ == '__main__':
         # train
         gpus           = None,
         batch_size     = 64,
-        disp_batches   = 50,
-        num_epochs     = 10,
+        disp_batches   = 200, #how frequently to show training evaluation
+        num_epochs     = 2,
         lr             = .01,
         lr_step_epochs = '10'
     )
@@ -124,4 +124,4 @@ if __name__ == '__main__':
     sym = net.get_symbol(**vars(args))
 
     # train
-    fit.fit(args, sym, get_mnist_iter)
+    fit.fit(args, sym, get_mnist_iter, batch_end_callback = mx.callback.do_checkpoint("batchcheck",1))
