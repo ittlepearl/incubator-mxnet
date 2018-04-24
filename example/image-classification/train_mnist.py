@@ -48,6 +48,14 @@ def to4d(img):
     """
     return img.reshape(img.shape[0], 1, 32, 32).astype(np.float32)/255
 
+def swap(data):
+    """
+    reshape to 2nd and 4th axes
+    """
+    res = mx.nd.swapaxes(data, 1, 3)
+    res = res.astype(np.float32)
+    return res
+
 def transform(data, label):
             #data = mx.image.imresize(data, 32, 32)
             #data = mx.nd.transpose(data, (2,0,1))
@@ -70,12 +78,12 @@ def get_mnist_iter(args, kv):
     # val = mx.gluon.data.DataLoader(mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform),
     #                         args.batch_size, shuffle=False, last_batch='rollover')
 
-    train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=lambda data, label: (nd.transpose(data.astype(np.float32), (2,0,1))/255, label))
+    train_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=True, transform=lambda data, label: (/255, label))
     val_cifar10 = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
     print (train_cifar10._data.shape)
-    print (to4d(train_cifar10._data).shape)
+    print (swap(train_cifar10._data).shape)
     print (train_cifar10._data.mean)
-    print (to4d(train_cifar10._data).mean)
+    print (swap(train_cifar10._data).mean)
     train = mx.io.NDArrayIter(
         train_cifar10._data, train_cifar10._label, args.batch_size, shuffle=True)
     val = mx.io.NDArrayIter(
