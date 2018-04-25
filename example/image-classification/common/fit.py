@@ -288,7 +288,7 @@ def fit(args, network, data_loader, **kwargs):
 
     # callbacks that run after each batch
     batch_end_callbacks = [mx.callback.Speedometer(
-        args.batch_size, args.disp_batches),_save_model]
+        args.batch_size, args.disp_batches),checkpoint]
     if 'batch_end_callback' in kwargs:
         cbs = kwargs['batch_end_callback']
         batch_end_callbacks += cbs if isinstance(cbs, list) else [cbs]
