@@ -111,7 +111,7 @@ if __name__ == '__main__':
         # train
         gpus           = None,
         batch_size     = 64,
-        disp_batches   = 400, #how frequently to show training evaluation
+        disp_batches   = 50, #how frequently to show training evaluation
         num_epochs     = 2,
         lr             = .01,
         lr_step_epochs = '10'
