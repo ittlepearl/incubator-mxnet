@@ -85,8 +85,8 @@ def do_checkpoint(prefix, period=1):
     period = int(max(1, period))
     def _callback(iter_no, sym, arg, aux):
         """The checkpoint function."""
-        if (iter_no + 1) % period == 0:
-            save_checkpoint(prefix, iter_no + 1, sym, arg, aux)
+        #if (iter_no + 1) % period == 0:
+        save_checkpoint(prefix, iter_no + 1, sym, arg, aux)
     return _callback
 
 
