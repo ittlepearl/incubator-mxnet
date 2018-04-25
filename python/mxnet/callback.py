@@ -149,7 +149,7 @@ class Speedometer(object):
         self.epoch = 0
         self.auto_reset = auto_reset
         self.prefix = prefix
-        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S ')
+
 
     def __call__(self, param):
         """Callback to Show speed."""
@@ -157,7 +157,7 @@ class Speedometer(object):
         if self.last_count > count:
             self.init = False
         self.last_count = count
-
+        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S ')
         if self.init:
             if count % self.frequent == 0:
                 self.epoch = self.epoch+1
