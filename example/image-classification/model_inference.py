@@ -20,7 +20,7 @@ def transform(data):
     return res
 
 def get_model(prefix, epoch):
-    sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, 0)
+    sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, epoch)
     mod = mx.mod.Module(symbol=sym, context=mx.cpu())
     mod.bind(for_training=False, data_shapes=[('data', (128,3,32,32))],
              label_shapes=mod._label_shapes)
@@ -34,20 +34,31 @@ def get_val_iter():
         swappedval, cifar10_val._label, 128)
     return val
 
-def main():
-
-    rootpath = '/home/ubuntu/qishanz2/src/incubator-mxnet/example/image-classification/'
-    prefix = './model/lenet'
-
-
-    cifar_model = get_model(prefix, 0)
-
-    val_iter = get_val_iter()
-
-    predictions = cifar_model.predict(val_iter)
-
-    print(predictions)
-    predicted_label = predictions[4].asnumpy().argmax()
-
+def get_groundtruth():
+    cifar10_val = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
+    return cifar10_val._label
+    
 if __name__ == '__main__':
-    main()
+    rootpath = '/home/ubuntu/qishanz2/src/incubator-mxnet/example/image-classification/'
+    prefix = './models/checkpoint'
+
+    runtime_acc = []
+
+    groundtruth = get_groundtruth()
+    print("get groundtruth successfully")
+    
+    for i in range(1,51):
+        cifar_model = get_model(prefix, i)
+        print("load model",i,"successfully")
+    
+        val_iter = get_val_iter()
+        predictions = cifar_model.predict(val_iter)
+        print(predictions.shape)
+    
+        predicted_label = predictions.asnumpy().argmax(1)
+        correct = np.sum(predicted_label == groundtruth)
+        accuracy = float(correct)/len(groundtruth)
+        print(accuracy)
+        runtime_acc.append(accuracy)
+
+
