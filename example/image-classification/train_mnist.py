@@ -112,7 +112,7 @@ if __name__ == '__main__':
         gpus           = None,
         batch_size     = 64,
         disp_batches   = 50, #how frequently to show training evaluation
-        num_epochs     = 2,
+        num_epochs     = 6,
         lr             = .01,
         lr_step_epochs = '10'
     )
