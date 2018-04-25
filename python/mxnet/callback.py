@@ -139,7 +139,7 @@ class Speedometer(object):
     Epoch[0] Batch [20] Speed: 1764.83 samples/sec  Train-accuracy=0.400000
     Epoch[0] Batch [30] Speed: 1740.59 samples/sec  Train-accuracy=0.500000
     """
-    def __init__(self, batch_size, frequent=50, auto_reset=True, prefix='checkpoint'):
+    def __init__(self, batch_size, frequent=50, auto_reset=True, prefix='./models/checkpoint'):
         self.batch_size = batch_size
         self.frequent = frequent
         self.init = False
@@ -154,12 +154,11 @@ class Speedometer(object):
         count = param.nbatch
         if self.last_count > count:
             self.init = False
-            self.epoch = self.epoch+1
         self.last_count = count
 
         if self.init:
             if count % self.frequent == 0:
-                print(param)
+                self.epoch = self.epoch+1
                 speed = self.frequent * self.batch_size / (time.time() - self.tic)
                 if param.eval_metric is not None:
                     name_value = param.eval_metric.get_name_value()
