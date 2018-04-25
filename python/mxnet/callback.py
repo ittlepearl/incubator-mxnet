@@ -85,8 +85,8 @@ def do_checkpoint(prefix, period=1):
     period = int(max(1, period))
     def _callback(iter_no, sym, arg, aux):
         """The checkpoint function."""
-        #if (iter_no + 1) % period == 0:
-        save_checkpoint(prefix, iter_no + 1, sym, arg, aux)
+        if (iter_no + 1) % period == 0:
+            save_checkpoint(prefix, iter_no + 1, sym, arg, aux)
     return _callback
 
 
@@ -139,12 +139,13 @@ class Speedometer(object):
     Epoch[0] Batch [20] Speed: 1764.83 samples/sec  Train-accuracy=0.400000
     Epoch[0] Batch [30] Speed: 1740.59 samples/sec  Train-accuracy=0.500000
     """
-    def __init__(self, batch_size, frequent=50, auto_reset=True):
+    def __init__(self, batch_size, frequent=50, auto_reset=True, prefix):
         self.batch_size = batch_size
         self.frequent = frequent
         self.init = False
         self.tic = 0
         self.last_count = 0
+        self.epoch = 0
         self.auto_reset = auto_reset
 
     def __call__(self, param):
@@ -152,6 +153,7 @@ class Speedometer(object):
         count = param.nbatch
         if self.last_count > count:
             self.init = False
+            self.epoch = self.epoch+1
         self.last_count = count
 
         if self.init:
@@ -168,6 +170,8 @@ class Speedometer(object):
                     logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
                                  param.epoch, count, speed)
                 self.tic = time.time()
+                save_checkpoint(prefix, self.epoch, false)
+                logging.info("save checkpoint %s-%d", prefix, self.epoch)
         else:
             self.init = True
             self.tic = time.time()
