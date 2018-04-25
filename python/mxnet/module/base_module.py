@@ -503,9 +503,7 @@ class BaseModule(object):
                     batch_end_params = BatchEndParam(epoch=epoch, nbatch=nbatch,
                                                      eval_metric=eval_metric,
                                                      locals=locals(),
-                                                     sym = self.symbol,
-                                                     arg_params = arg_params,
-                                                     aux_params = aux_params
+                                                     sym = self.symbol
                                                      )
                     for callback in _as_list(batch_end_callback):
                         callback(batch_end_params)
