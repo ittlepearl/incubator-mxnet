@@ -172,7 +172,7 @@ class Speedometer(object):
                     logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
                                  param.epoch, count, speed)
                 self.tic = time.time()
-                save_checkpoint(self.prefix, self.epoch, param.sym, param.arg_params, param.aux_params)
+                save_checkpoint(self.prefix, self.epoch, param.sym, param.locals['arg_params'], param.locals['aux_params'])
                 logging.info("save checkpoint %s-%d", self.prefix, self.epoch)
         else:
             self.init = True
