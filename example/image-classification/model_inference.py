@@ -11,6 +11,13 @@ def swap(data):
     res = res.astype(np.float32)/255
     return res
 
+def transform(data):
+    #data = mx.image.imresize(data, 32, 32)
+    res = data.transpose((2,0,1))
+    #data = mx.nd.swapaxes(data, 0, 2)
+    res = res.astype(np.float32)
+    return res
+    
 def get_model(prefix, epoch):
     sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, 0)
     mod = mx.mod.Module(symbol=sym, context=mx.cpu())
