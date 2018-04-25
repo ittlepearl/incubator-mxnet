@@ -23,6 +23,7 @@ import re
 import math
 import mxnet as mx
 
+nbatch = 0
 
 def _get_lr_scheduler(args, kv):
     if 'lr_factor' not in args or args.lr_factor >= 1:
@@ -65,6 +66,8 @@ def _load_model(args, rank=0):
 
 
 def _save_model(args, rank=0):
+    nbatch++
+    print("nbatch %d", nbatch)
     if args.model_prefix is None:
         return None
     dst_dir = os.path.dirname(args.model_prefix)
@@ -302,6 +305,7 @@ def fit(args, network, data_loader, **kwargs):
               arg_params=arg_params,
               aux_params=aux_params,
               batch_end_callback=batch_end_callbacks,
-              epoch_end_callback=checkpoint,
+              #epoch_end_callback=checkpoint,
+              epoch_end_callback=None,
               allow_missing=True,
               monitor=monitor)
