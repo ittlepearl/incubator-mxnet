@@ -139,7 +139,7 @@ class Speedometer(object):
     Epoch[0] Batch [20] Speed: 1764.83 samples/sec  Train-accuracy=0.400000
     Epoch[0] Batch [30] Speed: 1740.59 samples/sec  Train-accuracy=0.500000
     """
-    def __init__(self, batch_size, frequent=50, auto_reset=True, prefix):
+    def __init__(self, batch_size, frequent=50, auto_reset=True, prefix='checkpoint'):
         self.batch_size = batch_size
         self.frequent = frequent
         self.init = False
