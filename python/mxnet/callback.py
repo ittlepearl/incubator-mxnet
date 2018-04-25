@@ -156,10 +156,10 @@ class Speedometer(object):
             self.init = False
             self.epoch = self.epoch+1
         self.last_count = count
-        print(param)
-
+        
         if self.init:
             if count % self.frequent == 0:
+                print(param)
                 speed = self.frequent * self.batch_size / (time.time() - self.tic)
                 if param.eval_metric is not None:
                     name_value = param.eval_metric.get_name_value()
