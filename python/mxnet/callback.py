@@ -139,7 +139,7 @@ class Speedometer(object):
     Epoch[0] Batch [20] Speed: 1764.83 samples/sec  Train-accuracy=0.400000
     Epoch[0] Batch [30] Speed: 1740.59 samples/sec  Train-accuracy=0.500000
     """
-    def __init__(self, batch_size, frequent=50, auto_reset=True, prefix='./models/checkpoint'):
+    def __init__(self, batch_size, frequent=50, auto_reset=True, prefix='./models/worker4'):
         print(prefix)
         self.batch_size = batch_size
         self.frequent = frequent
@@ -149,6 +149,7 @@ class Speedometer(object):
         self.epoch = 0
         self.auto_reset = auto_reset
         self.prefix = prefix
+        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S ')
 
     def __call__(self, param):
         """Callback to Show speed."""
@@ -173,7 +174,6 @@ class Speedometer(object):
                                  param.epoch, count, speed)
                 self.tic = time.time()
                 save_checkpoint(self.prefix, self.epoch, param.sym, param.locals['arg_params'], param.locals['aux_params'])
-                logging.info("save checkpoint %s-%d", self.prefix, self.epoch)
         else:
             self.init = True
             self.tic = time.time()
