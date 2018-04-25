@@ -1,5 +1,6 @@
 from common import find_mxnet
 import mxnet as mx
+import numpy as np
 import urllib
 
 def swap(data):
@@ -17,7 +18,7 @@ def transform(data):
     #data = mx.nd.swapaxes(data, 0, 2)
     res = res.astype(np.float32)
     return res
-    
+
 def get_model(prefix, epoch):
     sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, 0)
     mod = mx.mod.Module(symbol=sym, context=mx.cpu())
