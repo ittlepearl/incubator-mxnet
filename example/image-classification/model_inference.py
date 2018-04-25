@@ -46,7 +46,7 @@ def main():
 
     predictions = cifar_model.predict(val_iter)
 
-    print(predictions.shape())
+    print(predictions)
     predicted_label = predictions[4].asnumpy().argmax()
 
 if __name__ == '__main__':
