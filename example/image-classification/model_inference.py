@@ -40,7 +40,7 @@ def main():
     prefix = './model/lenet'
 
 
-    mod = get_model(prefix, 0)
+    cifar_model = get_model(prefix, 0)
 
     val_iter = get_val_iter()
 
