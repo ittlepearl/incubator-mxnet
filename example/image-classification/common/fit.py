@@ -305,7 +305,7 @@ def fit(args, network, data_loader, **kwargs):
               initializer=initializer,
               arg_params=arg_params,
               aux_params=aux_params,
-              batch_end_callback=batch_end_callbacks,
+              batch_end_callback=checkpoint,
               #epoch_end_callback=checkpoint,
               epoch_end_callback=None,
               allow_missing=True,
