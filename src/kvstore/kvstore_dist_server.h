@@ -693,19 +693,23 @@ struct KVMeta {
           res_sum = (real_t*)calloc(alldata_v[0].vals.size(), sizeof(real_t)); // size-bzt_num-2
           // artificial byzantine by multiplying the first array by 5
           real_t* a1 = (real_t*)alldata_v[0].vals.data();
+          real_t* a3 = (real_t*)alldata_v[2].vals.data();
+          real_t* a5 = (real_t*)alldata_v[4].vals.data();
           for (int n = 0; n < alldata_v[0].vals.size(); n++) {
             a1[n] *= -100;
+            a3[n] *= -90;
+            a5[n] *= -110;
           }
-          int byzt_num = 1;
+          int byzt_num = 3;
 
           // ------ KRUM ---------
-          // Krum(alldata_v, res_sum, byzt_num);
+          Krum(alldata_v, res_sum, byzt_num);
 
           // ------ TrimmedMean ---------
           // TrimmedMean(alldata_v, res_sum, byzt_num);
 
           // ------ CongAlgo -----
-          CongAlgo(alldata_v, res_sum, byzt_num);
+          // CongAlgo(alldata_v, res_sum, byzt_num);
 
           // ------- test failure case with no Krum -------
           // int nd_size = alldata_v[0].lens[0];
