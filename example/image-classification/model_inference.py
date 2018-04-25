@@ -1,3 +1,4 @@
+from common import find_mxnet
 import mxnet as mx
 import urllib
 
