@@ -54,9 +54,7 @@ BatchEndParam = namedtuple('BatchEndParams',
                             'nbatch',
                             'eval_metric',
                             'locals',
-                            'sym',
-                            'arg',
-                            'aux'])
+                            'sym'])
 
 def _create_kvstore(kvstore, num_device, arg_params):
     """Create kvstore

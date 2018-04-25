@@ -504,8 +504,8 @@ class BaseModule(object):
                                                      eval_metric=eval_metric,
                                                      locals=locals(),
                                                      sym = self.symbol,
-                                                     arg = arg_params,
-                                                     aux = aux_params
+                                                     arg_params = arg_params,
+                                                     aux_params = aux_params
                                                      )
                     for callback in _as_list(batch_end_callback):
                         callback(batch_end_params)
