@@ -156,6 +156,7 @@ class Speedometer(object):
             self.init = False
             self.epoch = self.epoch+1
         self.last_count = count
+        print(param)
 
         if self.init:
             if count % self.frequent == 0:
@@ -171,7 +172,7 @@ class Speedometer(object):
                     logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
                                  param.epoch, count, speed)
                 self.tic = time.time()
-                save_checkpoint(self.prefix, self.epoch, False)
+                #save_checkpoint(self.prefix, self.epoch, False)
                 logging.info("save checkpoint %s-%d", prefix, self.epoch)
         else:
             self.init = True
