@@ -25,7 +25,7 @@ def get_val_iter():
         swappedval, val_cifar10._label, 128)
     return val
 
-def main:
+def main():
 
     rootpath = '/home/ubuntu/qishanz2/src/incubator-mxnet/example/image-classification/'
     prefix = './model/lenet'
@@ -39,3 +39,6 @@ def main:
 
     print(predictions.shape())
     predicted_label = predictions[4].asnumpy().argmax()
+
+if __name__ == '__main__':
+    main()
