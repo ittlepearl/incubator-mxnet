@@ -152,7 +152,7 @@ class Speedometer(object):
 
 
     def __call__(self, param):
-        logging.info("prefix is", self.prefix)
+        logging.info("prefix is %s", self.prefix)
         """Callback to Show speed."""
         count = param.nbatch
         if self.last_count > count:
