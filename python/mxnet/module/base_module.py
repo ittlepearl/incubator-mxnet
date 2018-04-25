@@ -499,9 +499,14 @@ class BaseModule(object):
                     monitor.toc_print()
 
                 if batch_end_callback is not None:
+                    arg_params, aux_params = self.get_params()
                     batch_end_params = BatchEndParam(epoch=epoch, nbatch=nbatch,
                                                      eval_metric=eval_metric,
-                                                     locals=locals())
+                                                     locals=locals(),
+                                                     sym = self.symbol,
+                                                     arg = arg_params,
+                                                     aux = aux_params
+                                                     )
                     for callback in _as_list(batch_end_callback):
                         callback(batch_end_params)
                 nbatch += 1
