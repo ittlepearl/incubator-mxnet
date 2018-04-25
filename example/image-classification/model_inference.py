@@ -31,7 +31,7 @@ def get_val_iter():
     cifar10_val = mx.gluon.data.vision.CIFAR10(root='~/.mxnet/datasets/cifar10', train=False, transform=transform)
     swappedval = swap(cifar10_val._data)
     val = mx.io.NDArrayIter(
-        swappedval, val_cifar10._label, 128)
+        swappedval, cifar10_val._label, 128)
     return val
 
 def main():
