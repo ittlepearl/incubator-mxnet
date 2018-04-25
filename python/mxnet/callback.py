@@ -147,6 +147,7 @@ class Speedometer(object):
         self.last_count = 0
         self.epoch = 0
         self.auto_reset = auto_reset
+        self.prefix = prefix
 
     def __call__(self, param):
         """Callback to Show speed."""
@@ -170,7 +171,7 @@ class Speedometer(object):
                     logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
                                  param.epoch, count, speed)
                 self.tic = time.time()
-                save_checkpoint(prefix, self.epoch, false)
+                save_checkpoint(self.prefix, self.epoch, false)
                 logging.info("save checkpoint %s-%d", prefix, self.epoch)
         else:
             self.init = True
