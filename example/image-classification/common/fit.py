@@ -66,6 +66,7 @@ def _load_model(args, rank=0):
 
 
 def _save_model(args, rank=0):
+    global nbatch
     nbatch = nbatch+1
     print("nbatch %d", nbatch)
     if args.model_prefix is None:
