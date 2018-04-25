@@ -158,7 +158,6 @@ class Speedometer(object):
         if self.last_count > count:
             self.init = False
         self.last_count = count
-        logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S ')
         if self.init:
             if count % self.frequent == 0:
                 self.epoch = self.epoch+1
@@ -174,7 +173,7 @@ class Speedometer(object):
                     logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
                                  param.epoch, count, speed)
                 self.tic = time.time()
-                logging.info("Runtime:", self.tic - self.inittic)
+                logging.info("Runtime:%.2f minutes", (self.tic - self.inittic)/60)
                 save_checkpoint(self.prefix, self.epoch, param.sym, param.locals['arg_params'], param.locals['aux_params'])
         else:
             self.init = True
