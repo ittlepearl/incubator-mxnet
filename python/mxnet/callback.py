@@ -167,12 +167,13 @@ class Speedometer(object):
                         param.eval_metric.reset()
                     msg = 'Epoch[%d] Batch [%d]\tSpeed: %.2f samples/sec'
                     msg += '\t%s=%f'*len(name_value)
-                    logging.info(msg, param.epoch, count, speed, *sum(name_value, ()))
+                    # logging.info(msg, param.epoch, count, speed, *sum(name_value, ()))
                 else:
-                    logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
+                    # logging.info("Iter[%d] Batch [%d]\tSpeed: %.2f samples/sec",
                                  param.epoch, count, speed)
                 self.tic = time.time()
-                logging.info("Runtime:%.2f minutes", (self.tic - self.inittic)/60)
+                param_name = '%s-%04d.params' % (prefix, epoch)
+                logging.info('Checkpoint[%d] Runtime:%.2f minutes Saved checkpoint to \"%s\"', (self.tic - self.inittic)/60, param_name)
                 save_checkpoint(self.prefix, self.epoch, param.sym, param.locals['arg_params'], param.locals['aux_params'])
         else:
             self.init = True
