@@ -173,7 +173,7 @@ class Speedometer(object):
                 #                  param.epoch, count, speed)
                 self.tic = time.time()
                 param_name = '%s-%04d.params' % (self.prefix, self.epoch)
-                print('Checkpoint[%d] Runtime:%.2f minutes Saved checkpoint to \"%s\"',self.epoch, (self.tic - self.inittic)/60, param_name)
+                logging.info('Checkpoint[%d] Runtime:%.2f minutes Saved checkpoint to \"%s\"',self.epoch, (self.tic - self.inittic)/60, param_name)
                 save_checkpoint(self.prefix, self.epoch, param.sym, param.locals['arg_params'], param.locals['aux_params'])
         else:
             self.init = True
