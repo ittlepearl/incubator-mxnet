@@ -632,7 +632,6 @@ struct KVMeta {
     // the operators with \a NDArray are actually finished
     if (req_meta.push) {
       /* --------original code */
-      push
       size_t ds[] = {(size_t)req_data.lens[0]};
       TShape dshape(ds, ds + 1);
       TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
