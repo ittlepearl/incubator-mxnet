@@ -594,8 +594,8 @@ struct KVMeta {
 
       // get n-q nearest neighbors
       int count = 0;
-      int start = ps::NumWorkers()/2;
-      int end = ps::NumWorkers()/2 + 1;
+      int start = ps::NumWorkers()/2 - 1;
+      int end = ps::NumWorkers()/2;
       while (count < ps::NumWorkers() - byzt_num) {
         if (end >= ps::NumWorkers() || start >= 0 && abs(one_dim_vec[start] - btmean) < abs(one_dim_vec[end] - btmean)) {
           res_sum[dim] += one_dim_vec[start];
@@ -631,14 +631,14 @@ struct KVMeta {
     // could be deallocated when this function returns. so we need to make sure
     // the operators with \a NDArray are actually finished
     if (req_meta.push) {
-      /* --------original code
-      // push
-      // size_t ds[] = {(size_t)req_data.lens[0]};
-      // TShape dshape(ds, ds + 1);
-      // TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
-      //                 dshape, cpu::kDevMask);
-      // NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
-      * original code end-------------- */
+      /* --------original code */
+      push
+      size_t ds[] = {(size_t)req_data.lens[0]};
+      TShape dshape(ds, ds + 1);
+      TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
+                      dshape, cpu::kDevMask);
+      NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
+      /* original code end-------------- */
       if (stored.is_none()) {
         size_t ds[] = {(size_t)req_data.lens[0]};
         TShape dshape(ds, ds + 1);
@@ -653,20 +653,21 @@ struct KVMeta {
         stored.WaitToRead();
       } else if (sync_mode_) {
          /* ------ baseline------- */
-        // synced push -- use merfed_buf_:It represents values from different workers being merged.
-        // auto& merged = merge_buf_[key];
-        // if (merged.array.is_none()) {
-        //   merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
-        // }
-        // if (merged.request.size() == 0) {
-        //   CopyFromTo(recved, &merged.array, 0);
-        // } else {
-        //   merged.array += recved;
-        // }
-        // merged.request.push_back(req_meta);
-        // ApplyUpdates(key, &merged, &stored, server);
+        synced push -- use merfed_buf_:It represents values from different workers being merged.
+        auto& merged = merge_buf_[key];
+        if (merged.array.is_none()) {
+          merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
+        }
+        if (merged.request.size() == 0) {
+          CopyFromTo(recved, &merged.array, 0);
+        } else {
+          merged.array += recved;
+        }
+        merged.request.push_back(req_meta);
+        ApplyUpdates(key, &merged, &stored, server);
         /* --------- baseline----------*/
 
+        /*
         auto& merged = merge_buf_[key];
         merged.request.push_back(req_meta);
 
@@ -730,6 +731,7 @@ struct KVMeta {
           ApplyUpdates(key, &merged, &stored, server);
           alldata_v.clear();
         }
+        */
 
       } else {
         // async push
