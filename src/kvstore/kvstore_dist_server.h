@@ -653,7 +653,7 @@ struct KVMeta {
         stored.WaitToRead();
       } else if (sync_mode_) {
          /* ------ baseline------- */
-        synced push -- use merfed_buf_:It represents values from different workers being merged.
+        // synced push -- use merfed_buf_:It represents values from different workers being merged.
         auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
           merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
