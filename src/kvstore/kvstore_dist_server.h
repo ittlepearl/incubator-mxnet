@@ -163,7 +163,8 @@ class KVStoreDistServer {
     Dist2TMean():value_(0.0),dist_(0.0)  { }
     Dist2TMean(real_t value, real_t dist):value_(value),dist_(dist) { }
     ~Dist2TMean() { }
-  }
+  };
+
   void CommandHandle(const ps::SimpleData& recved, ps::SimpleApp* app) {
     CommandType recved_type = static_cast<CommandType>(recved.head);
     if (recved_type == CommandType::kStopServer) {
@@ -617,7 +618,7 @@ struct KVMeta {
       std::sort(dist_vec.begin(), dist_vec.end(), CompareByDist);
 
       for (int i = 0; i < ps::NumWorkers() - byzt_num; i++) {
-        res_sum[dim] += dist_vec[i];
+        res_sum[dim] += dist_vec[i].value;
       }
       res_sum[dim] /= count;
     }
