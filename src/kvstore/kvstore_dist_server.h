@@ -156,6 +156,14 @@ class KVStoreDistServer {
     NDArray array;
   };
 
+  struct Dist2TMean {
+    public:
+    real_t value_;
+    real_t dist_;
+    Dist2TMean():value_(0.0),dist_(0.0)  { }
+    Dist2TMean(real_t value, real_t dist):value_(value),dist_(dist) { }
+    ~Dist2TMean() { }
+  }
   void CommandHandle(const ps::SimpleData& recved, ps::SimpleApp* app) {
     CommandType recved_type = static_cast<CommandType>(recved.head);
     if (recved_type == CommandType::kStopServer) {
@@ -548,6 +556,7 @@ struct KVMeta {
 
   }
 
+
   void TrimmedMean(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
     CHECK_GT(ps::NumWorkers() - 2 * byzt_num, 0) << "number of byzantine node is too big!";
 
@@ -572,6 +581,8 @@ struct KVMeta {
     }
   }
 
+  bool Dist2TMeanComparator (Dist2TMean i,Dist2TMean j) { return (i.dist<j.dist); }
+
   void CongAlgo(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
     CHECK_GT(ps::NumWorkers() - 2 * byzt_num, 0) << "number of byzantine node is too big!";
     int nd_size = alldata_v[0].lens[0];
@@ -593,19 +604,15 @@ struct KVMeta {
       btmean /= trimmedcount;
 
       // get n-q nearest neighbors
-      int count = 0;
-      int start = ps::NumWorkers()/2 - 1;
-      int end = ps::NumWorkers()/2;
-      while (count < ps::NumWorkers() - byzt_num) {
-        if (end >= ps::NumWorkers() || start >= 0 && abs(one_dim_vec[start] - btmean) < abs(one_dim_vec[end] - btmean)) {
-          res_sum[dim] += one_dim_vec[start];
-          start --;
-        }
-        else if (start < 0 || end < ps::NumWorkers() && abs(one_dim_vec[start] - btmean) >= abs(one_dim_vec[end] - btmean)){
-          res_sum[dim] += one_dim_vec[end];
-          end++;
-        }
-        count ++;
+      std::vector<*Dist2TMean> dist_vec(0);
+      for (auto one_dim_data : one_dim_vec) {
+        struct Dist2TMean p(one_dim_data, abs(one_dim_data - btmean));
+      }
+
+      std::sort(dist_vec.begin(), dist_vec.end(), Dist2TMeanComparator);
+
+      for (int i = 0; i < ps::NumWorkers() - byzt_num; i++) {
+        res_sum[dim] += dist_vec[i];
       }
       res_sum[dim] /= count;
     }
