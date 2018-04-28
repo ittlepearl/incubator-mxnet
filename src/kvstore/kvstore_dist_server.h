@@ -616,7 +616,7 @@ struct KVMeta {
       }
 
       std::sort(dist_vec.begin(), dist_vec.end(), [](const Dist2TMean &x, const Dist2TMean &y) {
-        return x.dist_ < y.dist_; 
+        return x.dist_ < y.dist_;
       });
 
       for (int i = 0; i < ps::NumWorkers() - byzt_num; i++) {
@@ -659,7 +659,7 @@ struct KVMeta {
         server->Response(req_meta); // ?
         stored.WaitToRead();
       } else if (sync_mode_) {
-         /* ------ baseline------- */
+         /* ------ baseline-------
         // synced push -- use merfed_buf_:It represents values from different workers being merged.
         size_t ds[] = {(size_t)req_data.lens[0]};
         TShape dshape(ds, ds + 1);
@@ -689,9 +689,9 @@ struct KVMeta {
         }
         merged.request.push_back(req_meta);
         ApplyUpdates(key, &merged, &stored, server);
-        /* --------- baseline----------*/
+        --------- baseline---------- */
 
-        /*
+
         auto& merged = merge_buf_[key];
         merged.request.push_back(req_meta);
 
@@ -728,13 +728,13 @@ struct KVMeta {
           int byzt_num = 1;
 
           // ------ KRUM ---------
-          Krum(alldata_v, res_sum, byzt_num);
+          // Krum(alldata_v, res_sum, byzt_num);
 
           // ------ TrimmedMean ---------
           // TrimmedMean(alldata_v, res_sum, byzt_num);
 
           // ------ CongAlgo -----
-          // CongAlgo(alldata_v, res_sum, byzt_num);
+          CongAlgo(alldata_v, res_sum, byzt_num);
 
           // ------- test failure case with no Krum -------
           // int nd_size = alldata_v[0].lens[0];
@@ -755,7 +755,7 @@ struct KVMeta {
           ApplyUpdates(key, &merged, &stored, server);
           alldata_v.clear();
         }
-        */
+
 
       } else {
         // async push
