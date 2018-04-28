@@ -661,10 +661,10 @@ struct KVMeta {
           merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
         }
 
-        int byzt_num = 3;
+        uint byzt_num = 3;
         if (merged.request.size() < byzt_num) {
           real_t* b1 = (real_t*)req_data.vals.data();
-          for (int n = 0; n < int(req_data.vals.size()); n++) {
+          for (uint n = 0; n < req_data.vals.size(); n++) {
             b1[n] *= -100;
           }
         }
