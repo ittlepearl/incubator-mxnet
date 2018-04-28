@@ -584,7 +584,7 @@ struct KVMeta {
 
   bool CompareByDist (const Dist2TMean &i, const Dist2TMean &j)
   {
-    return (i.dist < j.dist);
+    return (i.dist_ < j.dist_);
   }
 
   void CongAlgo(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
