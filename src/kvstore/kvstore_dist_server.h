@@ -581,12 +581,16 @@ struct KVMeta {
     }
   }
 
-  bool Dist2TMeanComparator (Dist2TMean i,Dist2TMean j) { return (i.dist<j.dist); }
+  bool CompareByDist (const Dist2TMean &i, const Dist2TMean &j)
+  {
+    return (i.dist < j.dist);
+  }
 
   void CongAlgo(const std::vector<ps::KVPairs<real_t>> &alldata_v, real_t* res_sum, int byzt_num) {
     CHECK_GT(ps::NumWorkers() - 2 * byzt_num, 0) << "number of byzantine node is too big!";
     int nd_size = alldata_v[0].lens[0];
     int trimmedcount = ps::NumWorkers()- 2 * byzt_num;
+    int count = ps::NumWorkers() - byzt_num;
 
     for (int dim = 0; dim < nd_size; dim++) {
       std::vector<double> one_dim_vec(0);
@@ -604,12 +608,13 @@ struct KVMeta {
       btmean /= trimmedcount;
 
       // get n-q nearest neighbors
-      std::vector<*Dist2TMean> dist_vec(0);
+      std::vector<Dist2TMean> dist_vec(0);
       for (auto one_dim_data : one_dim_vec) {
         struct Dist2TMean p(one_dim_data, abs(one_dim_data - btmean));
+        dist_vec.push_back(p);
       }
 
-      std::sort(dist_vec.begin(), dist_vec.end(), Dist2TMeanComparator);
+      std::sort(dist_vec.begin(), dist_vec.end(), CompareByDist);
 
       for (int i = 0; i < ps::NumWorkers() - byzt_num; i++) {
         res_sum[dim] += dist_vec[i];
