@@ -611,7 +611,7 @@ struct KVMeta {
       // get n-q nearest neighbors
       std::vector<Dist2TMean> dist_vec(0);
       for (auto one_dim_data : one_dim_vec) {
-        struct Dist2TMean p(one_dim_data, abs(one_dim_data - btmean));
+        Dist2TMean p(one_dim_data, abs(one_dim_data - btmean));
         dist_vec.push_back(p);
       }
 
