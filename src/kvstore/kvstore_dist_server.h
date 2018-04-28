@@ -631,14 +631,7 @@ struct KVMeta {
     // could be deallocated when this function returns. so we need to make sure
     // the operators with \a NDArray are actually finished
     if (req_meta.push) {
-      /* --------original code */
-      size_t ds[] = {(size_t)req_data.lens[0]};
-      TShape dshape(ds, ds + 1);
-      TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
-                      dshape, cpu::kDevMask);
-      NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
-      /* original code end-------------- */
-      if (stored.is_none()) {
+        if (stored.is_none()) {
         size_t ds[] = {(size_t)req_data.lens[0]};
         TShape dshape(ds, ds + 1);
         TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
@@ -653,10 +646,27 @@ struct KVMeta {
       } else if (sync_mode_) {
          /* ------ baseline------- */
         // synced push -- use merfed_buf_:It represents values from different workers being merged.
+        size_t ds[] = {(size_t)req_data.lens[0]};
+        TShape dshape(ds, ds + 1);
+
         auto& merged = merge_buf_[key];
         if (merged.array.is_none()) {
           merged.array = NDArray(dshape, Context()); // Context()-cpu/gpu
         }
+
+        int byzt_num = 1;
+        if (merged.request.size() < byzt_num) {
+          real_t* b1 = (real_t*)req_data.vals.data();
+          for (int n = 0; n < req_data.vals.size(); n++) {
+            b1[n] *= -100;
+          }
+        }
+
+        TBlob recv_blob((real_t*)req_data.vals.data(), // NOLINT(*)
+                        dshape, cpu::kDevMask);
+        NDArray recved = NDArray(recv_blob, 0); // received data needed to pushed to stored
+
+
         if (merged.request.size() == 0) {
           CopyFromTo(recved, &merged.array, 0);
         } else {
