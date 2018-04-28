@@ -618,7 +618,7 @@ struct KVMeta {
       std::sort(dist_vec.begin(), dist_vec.end(), CompareByDist);
 
       for (int i = 0; i < ps::NumWorkers() - byzt_num; i++) {
-        res_sum[dim] += dist_vec[i].value;
+        res_sum[dim] += dist_vec[i].value_;
       }
       res_sum[dim] /= count;
     }
