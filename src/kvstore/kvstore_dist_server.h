@@ -731,10 +731,10 @@ struct KVMeta {
           // Krum(alldata_v, res_sum, byzt_num);
 
           // ------ TrimmedMean ---------
-          // TrimmedMean(alldata_v, res_sum, byzt_num);
+          TrimmedMean(alldata_v, res_sum, byzt_num);
 
           // ------ CongAlgo -----
-          CongAlgo(alldata_v, res_sum, byzt_num);
+          // CongAlgo(alldata_v, res_sum, byzt_num);
 
           // ------- test failure case with no Krum -------
           // int nd_size = alldata_v[0].lens[0];
