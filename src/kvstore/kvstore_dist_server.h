@@ -722,10 +722,10 @@ struct KVMeta {
           real_t* a5 = (real_t*)alldata_v[4].vals.data();
           for (int n = 0; n < alldata_v[0].vals.size(); n++) {
             a1[n] *= -100;
-            // a3[n] *= -90;
-            // a5[n] *= -110;
+            a3[n] *= -90;
+            a5[n] *= -110;
           }
-          int byzt_num = 1;
+          int byzt_num = 3;
 
           // ------ KRUM ---------
           // Krum(alldata_v, res_sum, byzt_num);
